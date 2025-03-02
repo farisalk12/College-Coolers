@@ -1,16 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const mainElement = document.getElementById("main-content");
-    const signinButton = document.getElementById("signin");
-    const signupButton = document.getElementById("signup");
-    const homeButton = document.getElementById("home");
-    const nav = document.querySelector("nav");
-    const footer = document.querySelector("footer");
+  const mainElement = document.getElementById("main-content");
+  const signinButton = document.getElementById("signin");
+  const signupButton = document.getElementById("signup");
+  const homeButton = document.getElementById("home");
+  const nav = document.querySelector("nav");
+  const footer = document.querySelector("footer");
 
-    let userDetails = {};
-    let accountIcon = null;
+  let userDetails = {};
+  let accountIcon = null;
 
-    function showAccountDetails() {
-        mainElement.innerHTML = `
+  function showAccountDetails() {
+    mainElement.innerHTML = `
             <div class="box has-background-info">
                 <h1 class="title">Account Details</h1>
                 <p><strong>Name:</strong> ${userDetails.name}</p>
@@ -19,54 +19,69 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
-        document.getElementById("logout").addEventListener("click", logout);
-    }
+    document.getElementById("logout").addEventListener("click", logout);
+  }
 
-    function logout() {
-        userDetails = {}; 
-        if (accountIcon) {
-            accountIcon.remove();
-            accountIcon = null;
-        }
-        signinButton.style.display = "inline-block";  
-        signupButton.style.display = "inline-block"; 
-        loadHomePage();
+  function logout() {
+    userDetails = {};
+    if (accountIcon) {
+      accountIcon.remove();
+      accountIcon = null;
     }
+    signinButton.style.display = "inline-block";
+    signupButton.style.display = "inline-block";
+    loadHomePage();
+  }
 
-    function loadHomePage() {
-        mainElement.innerHTML = `
-            <section class="hero is-info">
-                <div class="hero-body">
-                    <div class="container has-text-centered">
-                        <h1 class="title">Welcome to College Coolers</h1>
-                        <p class="subtitle">
-                            We deliver water coolers every semester across apartments in Madison, WI.
-                        </p>
-                    </div>
-                </div>
-            </section>
-                 <section class="info">
-        <div class="semester_info box">Upcoming Semesters</div>
-        <div class="semester_info box">Fall 2025</div>
+  function loadHomePage() {
+    mainElement.innerHTML = `
+            <section class="hero is-medium is-info">
+        <div class="hero-body">
+          <div class="container has-text-centered">
+            <h1 class="title">Welcome to College Coolers</h1>
+            <p class="subtitle">
+              We deliver water coolers every semester across apartments in
+              Madison, WI.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="info">
+        <div class="semester_info box">
+          For the last 18 years we have provided the highest quality water to
+          students across UW Madison Campus. We deliver water coolers right to
+          your door every single week, ensuring you stray hydrated all semester
+          long. All you have to do is create an account with your name and phone
+          number, where you are currently living, and the number of coolers you
+          will need each week. For new customers, we will provide you with the
+          dispensing machine, free of charge!
+        </div>
+        <div class="semester_info box">
+          Spring 2025 Rates:
+          <p>One Cooler: $315</p>
+          <p>Two Cooler: $400</p>
+          <p>Three Cooler: $475</p>
+          <p>Four Cooler: $540</p>
+        </div>
       </section>
         `;
-    }
+  }
 
-    function addAccountIcon() {
-        if (!accountIcon) {
-            accountIcon = document.createElement("img");
-            accountIcon.src = "favicon.png"; // Use the favicon as the account icon
-            accountIcon.alt = "Account Icon";
-            accountIcon.classList.add("account-icon"); // Assign a CSS class
-            accountIcon.addEventListener("click", showAccountDetails);
-            nav.appendChild(accountIcon);
-        }
+  function addAccountIcon() {
+    if (!accountIcon) {
+      accountIcon = document.createElement("img");
+      accountIcon.src = "favicon.png"; // Use the favicon as the account icon
+      accountIcon.alt = "Account Icon";
+      accountIcon.classList.add("account-icon"); // Assign a CSS class
+      accountIcon.addEventListener("click", showAccountDetails);
+      nav.appendChild(accountIcon);
     }
+  }
 
-    // Sign Up Modal
-    const signupModal = document.createElement('div');
-    signupModal.classList.add("modal");
-    signupModal.innerHTML = `
+  // Sign Up Modal
+  const signupModal = document.createElement("div");
+  signupModal.classList.add("modal");
+  signupModal.innerHTML = `
         <div class="modal-background"></div>
         <div class="modal-content">
             <div class="box">
@@ -106,31 +121,33 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
     `;
-    document.body.appendChild(signupModal);
+  document.body.appendChild(signupModal);
 
-    signupButton.addEventListener("click", () => {
-        signupModal.classList.add("is-active");
+  signupButton.addEventListener("click", () => {
+    signupModal.classList.add("is-active");
+  });
+
+  signupModal.querySelector(".modal-close").addEventListener("click", () => {
+    signupModal.classList.remove("is-active");
+  });
+
+  signupModal
+    .querySelector("#signupForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+      userDetails.name = document.getElementById("signupName").value;
+      userDetails.email = document.getElementById("signupEmail").value;
+      signinButton.style.display = "none"; // Hide Sign In button
+      signupButton.style.display = "none"; // Hide Sign Up button
+      addAccountIcon();
+      signupModal.classList.remove("is-active");
+      showAccountDetails();
     });
 
-    signupModal.querySelector(".modal-close").addEventListener("click", () => {
-        signupModal.classList.remove("is-active");
-    });
-
-    signupModal.querySelector("#signupForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-        userDetails.name = document.getElementById("signupName").value;
-        userDetails.email = document.getElementById("signupEmail").value;
-        signinButton.style.display = "none";  // Hide Sign In button
-        signupButton.style.display = "none";  // Hide Sign Up button
-        addAccountIcon();
-        signupModal.classList.remove("is-active");
-        showAccountDetails();
-    });
-
-    // Sign In Modal
-    const signinModal = document.createElement('div');
-    signinModal.classList.add("modal");
-    signinModal.innerHTML = `
+  // Sign In Modal
+  const signinModal = document.createElement("div");
+  signinModal.classList.add("modal");
+  signinModal.innerHTML = `
         <div class="modal-background"></div>
         <div class="modal-content">
             <div class="box">
@@ -158,33 +175,35 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
     `;
-    document.body.appendChild(signinModal);
+  document.body.appendChild(signinModal);
 
-    signinButton.addEventListener("click", () => {
-        signinModal.classList.add("is-active");
+  signinButton.addEventListener("click", () => {
+    signinModal.classList.add("is-active");
+  });
+
+  signinModal.querySelector(".modal-close").addEventListener("click", () => {
+    signinModal.classList.remove("is-active");
+  });
+
+  signinModal
+    .querySelector("#signinForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+      userDetails.email = document.getElementById("signinEmail").value;
+      userDetails.name = "User";
+      signinButton.style.display = "none"; // Hide Sign In button
+      signupButton.style.display = "none"; // Hide Sign Up button
+      addAccountIcon();
+      signinModal.classList.remove("is-active");
+      showAccountDetails();
     });
 
-    signinModal.querySelector(".modal-close").addEventListener("click", () => {
-        signinModal.classList.remove("is-active");
-    });
+  homeButton.addEventListener("click", loadHomePage);
 
-    signinModal.querySelector("#signinForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-        userDetails.email = document.getElementById("signinEmail").value;
-        userDetails.name = "User";
-        signinButton.style.display = "none";  // Hide Sign In button
-        signupButton.style.display = "none";  // Hide Sign Up button
-        addAccountIcon();
-        signinModal.classList.remove("is-active");
-        showAccountDetails();
-    });
-
-    homeButton.addEventListener("click", loadHomePage);
-
-    // Contact Us Modal
-    const contactUsModal = document.createElement('div');
-    contactUsModal.classList.add("modal");
-    contactUsModal.innerHTML = `
+  // Contact Us Modal
+  const contactUsModal = document.createElement("div");
+  contactUsModal.classList.add("modal");
+  contactUsModal.innerHTML = `
     <div class="modal-background"></div>
     <div class="modal-content">
         <div class="box">
@@ -275,37 +294,37 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
     <button class="modal-close is-large" aria-label="close"></button>
 `;
-    document.body.appendChild(contactUsModal);
+  document.body.appendChild(contactUsModal);
 
-    const contactUs = document.createElement("p");
-    contactUs.innerHTML = `<a href="#contact" id="contact-us" class="contact-link">Contact Us</a>`;
-    contactUs.addEventListener("click", () => {
-        contactUsModal.classList.add("is-active");
-    });
+  const contactUs = document.createElement("p");
+  contactUs.innerHTML = `<a href="#contact" id="contact-us" class="contact-link">Contact Us</a>`;
+  contactUs.addEventListener("click", () => {
+    contactUsModal.classList.add("is-active");
+  });
 
-    contactUsModal.querySelector(".modal-close").addEventListener("click", () => {
-        contactUsModal.classList.remove("is-active");
-    });
+  contactUsModal.querySelector(".modal-close").addEventListener("click", () => {
+    contactUsModal.classList.remove("is-active");
+  });
 
-    // Footer with icons
-    const phoneIcon = document.createElement("img");
-    phoneIcon.src = "telephone.png"; 
-    phoneIcon.alt = "Phone Icon";
-    phoneIcon.classList.add("footer-icon");
-    phoneIcon.addEventListener("click", function() {
-        window.location.href = "tel:+1234567890";  
-    });
+  // Footer with icons
+  const phoneIcon = document.createElement("img");
+  phoneIcon.src = "telephone.png";
+  phoneIcon.alt = "Phone Icon";
+  phoneIcon.classList.add("footer-icon");
+  phoneIcon.addEventListener("click", function () {
+    window.location.href = "tel:+1234567890";
+  });
 
-    const instagramIcon = document.createElement("img");
-    instagramIcon.src = "social.png"; 
-    instagramIcon.alt = "Instagram Icon";
-    instagramIcon.classList.add("footer-icon");
-    instagramIcon.addEventListener("click", function() {
-        window.location.href = "https://www.instagram.com/your_instagram_handle";  
-    });
+  const instagramIcon = document.createElement("img");
+  instagramIcon.src = "social.png";
+  instagramIcon.alt = "Instagram Icon";
+  instagramIcon.classList.add("footer-icon");
+  instagramIcon.addEventListener("click", function () {
+    window.location.href = "https://www.instagram.com/your_instagram_handle";
+  });
 
-    footer.innerHTML = ""; 
-    footer.appendChild(contactUs);
-    footer.appendChild(phoneIcon);
-    footer.appendChild(instagramIcon);
+  footer.innerHTML = "";
+  footer.appendChild(contactUs);
+  footer.appendChild(phoneIcon);
+  footer.appendChild(instagramIcon);
 });
