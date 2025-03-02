@@ -11,11 +11,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function showAccountDetails() {
         mainElement.innerHTML = `
-            <div class="form">
-                <h1>Account Details</h1>
+            <div class="box has-background-info">
+                <h1 class="title">Account Details</h1>
                 <p><strong>Name:</strong> ${userDetails.name}</p>
                 <p><strong>Email:</strong> ${userDetails.email}</p>
-                <button id="logout">Logout</button>
+                <button id="logout" class="button is-danger">Logout</button>
             </div>
         `;
 
@@ -23,24 +23,32 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function logout() {
-        userDetails = {};
+        userDetails = {}; 
         if (accountIcon) {
             accountIcon.remove();
             accountIcon = null;
         }
+        signinButton.style.display = "inline-block";  
+        signupButton.style.display = "inline-block"; 
         loadHomePage();
     }
 
     function loadHomePage() {
         mainElement.innerHTML = `
-            <section class="hero">
-                <h1>Welcome to College Coolers</h1>
-                <p>We deliver water coolers every semester across apartments in Madison, WI.</p>
+            <section class="hero is-info">
+                <div class="hero-body">
+                    <div class="container has-text-centered">
+                        <h1 class="title">Welcome to College Coolers</h1>
+                        <p class="subtitle">
+                            We deliver water coolers every semester across apartments in Madison, WI.
+                        </p>
+                    </div>
+                </div>
             </section>
-            <section class="info">
-                <div class="semester_info">Upcoming Semesters</div>
-                <div class="semester_info">Fall 2025</div>
-            </section>
+                 <section class="info">
+        <div class="semester_info box">Upcoming Semesters</div>
+        <div class="semester_info box">Fall 2025</div>
+      </section>
         `;
     }
 
@@ -55,92 +63,249 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    signupButton.addEventListener("click", () => {
-        mainElement.innerHTML = `
-            <div class="form">
-                <h1>Sign Up</h1>
+    // Sign Up Modal
+    const signupModal = document.createElement('div');
+    signupModal.classList.add("modal");
+    signupModal.innerHTML = `
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="box">
+                <h1 class="title">Sign Up</h1>
                 <form id="signupForm">
-                    <p>Name: <input type="text" id="signupName" required></p>
-                    <p>Email: <input type="email" id="signupEmail" required></p>
-                    <p>Password: <input type="password" required></p>
-                    <p>Confirm Password: <input type="password" required></p>
-                    <input type="submit" value="Sign Up">
+                    <div class="field">
+                        <label class="label">Name</label>
+                        <div class="control">
+                            <input class="input" type="text" id="signupName" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control">
+                            <input class="input" type="email" id="signupEmail" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Password</label>
+                        <div class="control">
+                            <input class="input" type="password" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Confirm Password</label>
+                        <div class="control">
+                            <input class="input" type="password" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-info">Sign Up</button>
+                        </div>
+                    </div>
                 </form>
             </div>
-        `;
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    `;
+    document.body.appendChild(signupModal);
 
-        document.getElementById("signupForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-            userDetails.name = document.getElementById("signupName").value;
-            userDetails.email = document.getElementById("signupEmail").value;
-            addAccountIcon();
-            showAccountDetails();
-        });
+    signupButton.addEventListener("click", () => {
+        signupModal.classList.add("is-active");
     });
 
-    signinButton.addEventListener("click", () => {
-        mainElement.innerHTML = `
-            <div class="form">
-                <h3 style="text-align: center">Sign in to your College Coolers Account.</h3>
+    signupModal.querySelector(".modal-close").addEventListener("click", () => {
+        signupModal.classList.remove("is-active");
+    });
+
+    signupModal.querySelector("#signupForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        userDetails.name = document.getElementById("signupName").value;
+        userDetails.email = document.getElementById("signupEmail").value;
+        signinButton.style.display = "none";  // Hide Sign In button
+        signupButton.style.display = "none";  // Hide Sign Up button
+        addAccountIcon();
+        signupModal.classList.remove("is-active");
+        showAccountDetails();
+    });
+
+    // Sign In Modal
+    const signinModal = document.createElement('div');
+    signinModal.classList.add("modal");
+    signinModal.innerHTML = `
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="box">
+                <h3 class="title is-4" style="text-align: center">Sign in to your College Coolers Account.</h3>
                 <form id="signinForm">
-                    <p>Email: <input type="email" id="signinEmail" required></p>
-                    <p>Password: <input type="password" required></p>
-                    <input type="submit" value="Sign In">
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control">
+                            <input class="input" type="email" id="signinEmail" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Password</label>
+                        <div class="control">
+                            <input class="input" type="password" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-info">Sign In</button>
+                        </div>
+                    </div>
                 </form>
             </div>
-        `;
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    `;
+    document.body.appendChild(signinModal);
 
-        document.getElementById("signinForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-            userDetails.email = document.getElementById("signinEmail").value;
-            userDetails.name = "User";
-            addAccountIcon();
-            showAccountDetails();
-        });
+    signinButton.addEventListener("click", () => {
+        signinModal.classList.add("is-active");
+    });
+
+    signinModal.querySelector(".modal-close").addEventListener("click", () => {
+        signinModal.classList.remove("is-active");
+    });
+
+    signinModal.querySelector("#signinForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        userDetails.email = document.getElementById("signinEmail").value;
+        userDetails.name = "User";
+        signinButton.style.display = "none";  // Hide Sign In button
+        signupButton.style.display = "none";  // Hide Sign Up button
+        addAccountIcon();
+        signinModal.classList.remove("is-active");
+        showAccountDetails();
     });
 
     homeButton.addEventListener("click", loadHomePage);
 
-    // Add Contact Us in the footer
+    // Contact Us Modal
+    const contactUsModal = document.createElement('div');
+    contactUsModal.classList.add("modal");
+    contactUsModal.innerHTML = `
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+            <h1 class="title is-3">How can we assist you?</h1>
+            <form id="contactForm">
+                <div class="field">
+                    <label class="label">Name (one per room)</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control">
+                        <input class="input" type="email" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Confirm Password</label>
+                    <div class="control">
+                        <input class="input" type="password" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Phone Number</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Building Name</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Room Number</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Names of Roommates (put N/A if applicable)</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Order Amount</label>
+                    <div class="control">
+                        <div class="select">
+                            <select>
+                                <option>One Cooler: $315</option>
+                                <option>Two Coolers: $400</option>
+                                <option>Three Coolers: $475</option>
+                                <option>Four Coolers: $540</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Are you a returning customer? (Answer YES if you already have a machine from last semester)</label>
+                    <div class="control">
+                        <label class="radio">
+                            <input type="radio" name="returning" value="yes" /> Yes
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="returning" value="no" /> No
+                        </label>
+                    </div>
+                </div>
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button type="submit" class="button is-info">Send</button>
+                    </div>
+                    <div class="control">
+                        <button type="reset" class="button is-light">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+`;
+    document.body.appendChild(contactUsModal);
+
     const contactUs = document.createElement("p");
     contactUs.innerHTML = `<a href="#contact" id="contact-us" class="contact-link">Contact Us</a>`;
     contactUs.addEventListener("click", () => {
-        mainElement.innerHTML = `
-   <div class="form">      
-   <h1>How can we assist you?</h1>
-   <form class="form">
-       <p>Name(one per room) <input type="text" required /></p>
-       <p>Email <input type = "email" required /> </p>
-       <p>Password <input type = "password" required /> </p>
-       <p>Confirm Password <input type = "password" required /> </p>
-       <p>Phone Number <input type="text" required /></p>
-       <p>Building Name <input type="text" required /></p>
-       <p>room number <input type="text" required /></p>
-       <p>
-        Names of Roommates (put N/A if applicable)
-       <input type="text" required />
-       </p>
-       <p>
-       Order amount?
-       <select>
-           <option>One Cooler: $315</option>
-           <option>Two Coolers: $400</option>
-           <option>Three Coolers: $475</option>
-           <option>Four Coolers: $540</option>
-       </select>
-       </p>
-       Are you a returning customer? (Answer YES if you already have a
-       machine from last semester)
-       <input type="radio" value="returning" />Yes
-       <input type="radio" value="returning" />No
-       <p></p>
-       <input type="submit" id="signup_submit" value="Send" />
-       <input type="reset" value="Reset" />
-   </form>
-   </div>`;
-});
+        contactUsModal.classList.add("is-active");
+    });
 
-    // Ensure only one Contact Us link exists
-    footer.innerHTML = ""; // Clear any existing duplicate links
+    contactUsModal.querySelector(".modal-close").addEventListener("click", () => {
+        contactUsModal.classList.remove("is-active");
+    });
+
+    // Footer with icons
+    const phoneIcon = document.createElement("img");
+    phoneIcon.src = "telephone.png"; 
+    phoneIcon.alt = "Phone Icon";
+    phoneIcon.classList.add("footer-icon");
+    phoneIcon.addEventListener("click", function() {
+        window.location.href = "tel:+1234567890";  
+    });
+
+    const instagramIcon = document.createElement("img");
+    instagramIcon.src = "social.png"; 
+    instagramIcon.alt = "Instagram Icon";
+    instagramIcon.classList.add("footer-icon");
+    instagramIcon.addEventListener("click", function() {
+        window.location.href = "https://www.instagram.com/your_instagram_handle";  
+    });
+
+    footer.innerHTML = ""; 
     footer.appendChild(contactUs);
+    footer.appendChild(phoneIcon);
+    footer.appendChild(instagramIcon);
 });
