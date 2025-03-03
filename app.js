@@ -88,34 +88,85 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h1 class="title">Sign Up</h1>
                 <form id="signupForm">
                     <div class="field">
-                        <label class="label">Name</label>
-                        <div class="control">
-                            <input class="input" type="text" id="signupName" required>
+                    <label class="label">Name (one per room)</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control">
+                        <input class="input" type="email" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Confirm Password</label>
+                    <div class="control">
+                        <input class="input" type="password" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Phone Number</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Building Name</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Room Number</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Names of Roommates (put N/A if applicable)</label>
+                    <div class="control">
+                        <input class="input" type="text" required />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Order Amount</label>
+                    <div class="control">
+                        <div class="select">
+                            <select>
+                                <option>One Cooler: $315</option>
+                                <option>Two Coolers: $400</option>
+                                <option>Three Coolers: $475</option>
+                                <option>Four Coolers: $540</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="field">
-                        <label class="label">Email</label>
-                        <div class="control">
-                            <input class="input" type="email" id="signupEmail" required>
-                        </div>
+                </div>
+                <div class="field">
+                    <label class="label">Are you a returning customer? (Answer YES if you already have a machine from last semester)</label>
+                    <div class="control">
+                        <label class="radio">
+                            <input type="radio" name="returning" value="yes" /> Yes
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="returning" value="no" /> No
+                        </label>
                     </div>
-                    <div class="field">
-                        <label class="label">Password</label>
-                        <div class="control">
-                            <input class="input" type="password" required>
-                        </div>
+                </div>
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button type="submit" class="button is-info">Send</button>
                     </div>
-                    <div class="field">
-                        <label class="label">Confirm Password</label>
-                        <div class="control">
-                            <input class="input" type="password" required>
-                        </div>
+                    <div class="control">
+                        <button type="reset" class="button is-light">Reset</button>
                     </div>
-                    <div class="field">
-                        <div class="control">
-                            <button type="submit" class="button is-info">Sign Up</button>
-                        </div>
-                    </div>
+                </div>
                 </form>
             </div>
         </div>
@@ -210,7 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <h1 class="title is-3">How can we assist you?</h1>
             <form id="contactForm">
                 <div class="field">
-                    <label class="label">Name (one per room)</label>
+                    <label class="label">Name</label>
                     <div class="control">
                         <input class="input" type="text" required />
                     </div>
@@ -221,64 +272,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         <input class="input" type="email" required />
                     </div>
                 </div>
-                <div class="field">
-                    <label class="label">Password</label>
-                    <div class="control">
-                        <input class="input" type="password" required />
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Confirm Password</label>
-                    <div class="control">
-                        <input class="input" type="password" required />
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Phone Number</label>
-                    <div class="control">
-                        <input class="input" type="text" required />
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Building Name</label>
-                    <div class="control">
-                        <input class="input" type="text" required />
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Room Number</label>
-                    <div class="control">
-                        <input class="input" type="text" required />
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Names of Roommates (put N/A if applicable)</label>
-                    <div class="control">
-                        <input class="input" type="text" required />
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Order Amount</label>
-                    <div class="control">
-                        <div class="select">
-                            <select>
-                                <option>One Cooler: $315</option>
-                                <option>Two Coolers: $400</option>
-                                <option>Three Coolers: $475</option>
-                                <option>Four Coolers: $540</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Are you a returning customer? (Answer YES if you already have a machine from last semester)</label>
-                    <div class="control">
-                        <label class="radio">
-                            <input type="radio" name="returning" value="yes" /> Yes
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="returning" value="no" /> No
-                        </label>
+                <div class = "field">
+                    <label class = "label"> Your Question </label>
+                    <div class = "control">
+                    <input class = "input" type = "textbox" required />
                     </div>
                 </div>
                 <div class="field is-grouped">
@@ -320,7 +317,7 @@ document.addEventListener("DOMContentLoaded", function () {
   instagramIcon.alt = "Instagram Icon";
   instagramIcon.classList.add("footer-icon");
   instagramIcon.addEventListener("click", function () {
-    window.location.href = "https://www.instagram.com/your_instagram_handle";
+    window.location.href = "https://www.instagram.com/collegecoolersuw/";
   });
 
   footer.innerHTML = "";
