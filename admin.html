@@ -14,17 +14,25 @@
   <body>
     <header class="navbar is-info">
       <div class="navbar-brand">
-        <a class="navbar-item has-text-white" id="home">COLLEGE COOLERS</a>
+        <a class="navbar-item has-text-white is-size-4" id="home"
+          >COLLEGE COOLERS</a
+        >
       </div>
       <nav class="navbar-end">
-        <button class="button is-info" style = "height: 100%" id="signin">Sign In</button>
-        <button class="button is-info" style = "height:100%" id="signup">Sign Up</button>
+        <button class="button is-info" style="height: 100%" id="signin">
+          Sign In
+        </button>
+        <button class="button is-info" style="height: 100%" id="signup">
+          Sign Up
+        </button>
       </nav>
     </header>
 
     <main class="admin-content">
-        <input class = "input" placeholder = "Search"> </input>
-      <table class = "table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+      <input class="input" placeholder="Search" />
+      <table
+        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+      >
         <tr>
           <th>Name</th>
           <th>Building Name</th>
@@ -62,7 +70,16 @@
     <footer class="footer has-background-light">
       <div class="content has-text-centered">
         <p class="has-text-dark">COLLEGE COOLERS</p>
-        <a href="#contact" id="contact-us" class="has-text-dark">Contact Us</a>
+        <a id="contact-us" class="has-text-dark">Contact Us</a>
+      </div>
+      <div class="modal" id="phonemodal">
+        <div class="modal-background" id="phonemodal-background"></div>
+        <div class="modal-content has-background-light" id="phonemodal-content">
+          <h1 class="is-size-4">Contact Us by Phone</h1>
+          <p>Phone Number 1:</p>
+          <p>Phone Number 2:</p>
+        </div>
+        <div class="modal-close is-large" id="phonemodal-close"></div>
       </div>
     </footer>
 

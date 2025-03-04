@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class = "field">
                     <label class = "label"> Your Question </label>
                     <div class = "control">
-                    <input class = "input" type = "textbox" required />
+                    <input class = "input" type = "textarea" required />
                     </div>
                 </div>
                 <div class="field is-grouped">
@@ -292,9 +292,7 @@ document.addEventListener("DOMContentLoaded", function () {
     <button class="modal-close is-large" aria-label="close"></button>
 `;
   document.body.appendChild(contactUsModal);
-
-  const contactUs = document.createElement("p");
-  contactUs.innerHTML = `<a href="#contact" id="contact-us" class="contact-link">Contact Us</a>`;
+  contactUs = document.getElementById("contact-us");
   contactUs.addEventListener("click", () => {
     contactUsModal.classList.add("is-active");
   });
@@ -308,8 +306,16 @@ document.addEventListener("DOMContentLoaded", function () {
   phoneIcon.src = "telephone.png";
   phoneIcon.alt = "Phone Icon";
   phoneIcon.classList.add("footer-icon");
-  phoneIcon.addEventListener("click", function () {
-    window.location.href = "tel:+1234567890";
+
+  const phoneModal = document.getElementById("phonemodal");
+
+  phoneIcon.addEventListener("click", () => {
+    phoneModal.classList.add("is-active");
+  });
+
+  const phoneModalClose = document.getElementById("phonemodal-close");
+  phoneModalClose.addEventListener("click", () => {
+    phoneModal.classList.remove("is-active");
   });
 
   const instagramIcon = document.createElement("img");
@@ -320,8 +326,6 @@ document.addEventListener("DOMContentLoaded", function () {
     window.location.href = "https://www.instagram.com/collegecoolersuw/";
   });
 
-  footer.innerHTML = "";
-  footer.appendChild(contactUs);
   footer.appendChild(phoneIcon);
   footer.appendChild(instagramIcon);
 });
