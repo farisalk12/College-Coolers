@@ -118,21 +118,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Building Name</label>
+                    <label class="label">Address</label>
                     <div class="control">
                         <input class="input" type="text" required />
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Room Number</label>
+                    <label class="label">Apartment Number</label>
                     <div class="control">
                         <input class="input" type="text" required />
                     </div>
+                </div>
+                <div class = "field">
+                  <label class = "label"> Number of Roommates </label>
+                  <div class = "control">
+                    <input class = "input" type = "number" required />
+                  </div>
                 </div>
                 <div class="field">
                     <label class="label">Names of Roommates (put N/A if applicable)</label>
                     <div class="control">
-                        <input class="input" type="text" required />
+                        <input class="input" type="text" />
                     </div>
                 </div>
                 <div class="field">
