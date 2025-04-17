@@ -16,17 +16,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h1 class="title">Account Details</h1>
                 <p><strong>Name:</strong> ${userDetails.name}</p>
                 <p><strong>Email:</strong> ${userDetails.email}</p>
-                <button id="make_pmt" class = "button is-white"> Make Payment </button>
                 <button id="logout" class="button is-danger">Logout</button>
-            </div>
-        `;
-      pmt_button = document.getElementById("make_pmt");
-      pmt_button.addEventListener("click", () => {
-        mainElement.innerHTML = `<div class = "box has-background-info">
-      <h1 class = "title is-white"> Payment Page </h1>
       </div>
-      `;
-      });
+        `;
+      // mainElement.innerHTML += `<button id="make_pmt" class = "button is-white"> Make Payment </button>`;
+
+      // pmt_button = document.getElementById("make_pmt");
+      // pmt_button.addEventListener("click", () => {
+      //   mainElement.innerHTML = `<div class = "box has-background-info">
+      // <h1 class = "title is-white"> Payment Page </h1>
+      // </div>
+      // `;
+      // });
     } else {
       mainElement.innerHTML = `
             <div class="admin box has-background-info">
@@ -87,6 +88,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
   account_icon = document.getElementById("account-icon");
   account_icon.addEventListener("click", showAccountDetails);
+  admin_page_btn = document.getElementById("admin_page_btn");
+  admin_page_btn.addEventListener("click", () => {
+    mainElement.innerHTML = `<input class="input" placeholder="Search" />
+      <table
+        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+      >
+        <tr>
+          <th>Name</th>
+          <th>Building Name</th>
+          <th>Room No.</th>
+          <th>Number of Roommates</th>
+          <th>Order Amount</th>
+          <th>Returning Customer</th>
+        </tr>
+        <tr>
+          <td>John Doe</td>
+          <td>Any Place</td>
+          <td>3500</td>
+          <td>2</td>
+          <td>1</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>John Doe</td>
+          <td>Any Place</td>
+          <td>3500</td>
+          <td>2</td>
+          <td>1</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>John Doe</td>
+          <td>Any Place</td>
+          <td>3500</td>
+          <td>2</td>
+          <td>1</td>
+          <td>Yes</td>
+        </tr>
+      </table>`;
+  });
 
   function logout() {
     userDetails = {};
@@ -106,6 +147,12 @@ document.addEventListener("DOMContentLoaded", function () {
       mainElement.classList.remove("admin");
     }
     account_icon.classList.add("is-hidden");
+    if (mainElement.classList.contains("admin")) {
+      mainElement.classList.remove("admin");
+    }
+    if (!admin_page_btn.classList.contains("is-hidden")) {
+      admin_page_btn.classList.add("is-hidden");
+    }
     loadHomePage();
   }
 
