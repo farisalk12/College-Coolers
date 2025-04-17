@@ -19,15 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 <button id="logout" class="button is-danger">Logout</button>
       </div>
         `;
-      // mainElement.innerHTML += `<button id="make_pmt" class = "button is-white"> Make Payment </button>`;
-
-      // pmt_button = document.getElementById("make_pmt");
-      // pmt_button.addEventListener("click", () => {
-      //   mainElement.innerHTML = `<div class = "box has-background-info">
-      // <h1 class = "title is-white"> Payment Page </h1>
-      // </div>
-      // `;
-      // });
     } else {
       mainElement.innerHTML = `
             <div class="admin box has-background-info">
