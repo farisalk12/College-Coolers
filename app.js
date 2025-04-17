@@ -10,27 +10,34 @@ document.addEventListener("DOMContentLoaded", function () {
   let accountIcon = null;
 
   function showAccountDetails() {
-    mainElement.innerHTML = `
+    if (!mainElement.classList.contains("admin")) {
+      mainElement.innerHTML = `
             <div class="box has-background-info">
+                <h1 class="title">Account Details</h1>
+                <p><strong>Name:</strong> ${userDetails.name}</p>
+                <p><strong>Email:</strong> ${userDetails.email}</p>
+                <button id="make_pmt" class = "button is-white"> Make Payment </button>
+                <button id="logout" class="button is-danger">Logout</button>
+            </div>
+        `;
+      pmt_button = document.getElementById("make_pmt");
+      pmt_button.addEventListener("click", () => {
+        mainElement.innerHTML = `<div class = "box has-background-info">
+      <h1 class = "title is-white"> Payment Page </h1>
+      </div>
+      `;
+      });
+    } else {
+      mainElement.innerHTML = `
+            <div class="admin box has-background-info">
                 <h1 class="title">Account Details</h1>
                 <p><strong>Name:</strong> ${userDetails.name}</p>
                 <p><strong>Email:</strong> ${userDetails.email}</p>
                 <button id="logout" class="button is-danger">Logout</button>
             </div>
         `;
-
-    document.getElementById("logout").addEventListener("click", logout);
-  }
-
-  function logout() {
-    userDetails = {};
-    if (accountIcon) {
-      accountIcon.remove();
-      accountIcon = null;
     }
-    signinButton.style.display = "inline-block";
-    signupButton.style.display = "inline-block";
-    loadHomePage();
+    document.getElementById("logout").addEventListener("click", logout);
   }
 
   function loadHomePage() {
@@ -76,6 +83,30 @@ document.addEventListener("DOMContentLoaded", function () {
       accountIcon.addEventListener("click", showAccountDetails);
       nav.appendChild(accountIcon);
     }
+  }
+
+  account_icon = document.getElementById("account-icon");
+  account_icon.addEventListener("click", showAccountDetails);
+
+  function logout() {
+    userDetails = {};
+    if (accountIcon) {
+      accountIcon.remove();
+      accountIcon = null;
+    }
+    signinButton.style.display = "inline-block";
+    signupButton.style.display = "inline-block";
+    if (signupButton.classList.contains("is-hidden")) {
+      signupButton.classList.remove("is-hidden");
+    }
+    if (signinButton.classList.contains("is-hidden")) {
+      signinButton.classList.remove("is-hidden");
+    }
+    if (mainElement.classList.contains("admin")) {
+      mainElement.classList.remove("admin");
+    }
+    account_icon.classList.add("is-hidden");
+    loadHomePage();
   }
 
   // Sign Up Modal
@@ -250,7 +281,8 @@ document.addEventListener("DOMContentLoaded", function () {
       userDetails.name = "User";
       signinButton.style.display = "none"; // Hide Sign In button
       signupButton.style.display = "none"; // Hide Sign Up button
-      addAccountIcon();
+      account_icon.classList.remove("is-hidden");
+      // addAccountIcon();
       signinModal.classList.remove("is-active");
       showAccountDetails();
     });
