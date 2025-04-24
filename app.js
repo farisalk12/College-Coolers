@@ -265,8 +265,7 @@ document.addEventListener("DOMContentLoaded", function () {
       userDetails.email = document.getElementById("signupEmail").value;
       signinButton.style.display = "none"; // Hide Sign In button
       signupButton.style.display = "none"; // Hide Sign Up button
-      account_icon.classList.remove("is-hidden");
-      // addAccountIcon();
+      addAccountIcon();
       signupModal.classList.remove("is-active");
       showAccountDetails();
     });
