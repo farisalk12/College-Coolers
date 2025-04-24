@@ -77,9 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  account_icon = document.getElementById("account-icon");
+  const account_icon = document.getElementById("account-icon");
   account_icon.addEventListener("click", showAccountDetails);
-  admin_page_btn = document.getElementById("admin_page_btn");
+  const admin_page_btn = document.getElementById("admin_page_btn");
   admin_page_btn.addEventListener("click", () => {
     mainElement.innerHTML = `<input class="input" placeholder="Search" />
       <table
@@ -265,7 +265,8 @@ document.addEventListener("DOMContentLoaded", function () {
       userDetails.email = document.getElementById("signupEmail").value;
       signinButton.style.display = "none"; // Hide Sign In button
       signupButton.style.display = "none"; // Hide Sign Up button
-      addAccountIcon();
+      account_icon.classList.remove("is-hidden");
+      // addAccountIcon();
       signupModal.classList.remove("is-active");
       showAccountDetails();
     });
