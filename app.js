@@ -87,35 +87,19 @@ document.addEventListener("DOMContentLoaded", function () {
       >
         <tr>
           <th>Name</th>
-          <th>Building Name</th>
-          <th>Room No.</th>
+          <th>Address</th>
+          <th>Apt No.</th>
           <th>Number of Roommates</th>
           <th>Order Amount</th>
           <th>Returning Customer</th>
         </tr>
         <tr>
-          <td>John Doe</td>
-          <td>Any Place</td>
-          <td>3500</td>
-          <td>2</td>
-          <td>1</td>
-          <td>Yes</td>
-        </tr>
-        <tr>
-          <td>John Doe</td>
-          <td>Any Place</td>
-          <td>3500</td>
-          <td>2</td>
-          <td>1</td>
-          <td>Yes</td>
-        </tr>
-        <tr>
-          <td>John Doe</td>
-          <td>Any Place</td>
-          <td>3500</td>
-          <td>2</td>
-          <td>1</td>
-          <td>Yes</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
       </table>`;
   });
