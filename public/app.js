@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const signinButton = document.getElementById("signin");
   const signupButton = document.getElementById("signup");
   const homeButton = document.getElementById("home");
+  const logo = document.getElementById("logo");
   const nav = document.querySelector("nav");
   const footer = document.querySelector("footer");
 
@@ -310,6 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   homeButton.addEventListener("click", loadHomePage);
+  logo.addEventListener("click", loadHomePage);
 
   // Contact Us Modal
   const contactUsModal = document.createElement("div");
@@ -365,6 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const phoneIcon = document.createElement("img");
   phoneIcon.src = "telephone.png";
   phoneIcon.alt = "Phone Icon";
+  phoneIcon.style = "margin: 15px";
   phoneIcon.classList.add("footer-icon");
 
   const phoneModal = document.getElementById("phonemodal");
@@ -381,6 +384,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const instagramIcon = document.createElement("img");
   instagramIcon.src = "Instagram_Glyph_Black.png";
   instagramIcon.alt = "Instagram Icon";
+  instagramIcon.style = "margin: 15px";
   instagramIcon.classList.add("footer-icon");
   instagramIcon.addEventListener("click", function () {
     window.location.href = "https://www.instagram.com/collegecoolersuw/";
