@@ -379,7 +379,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   const instagramIcon = document.createElement("img");
-  instagramIcon.src = "social.png";
+  instagramIcon.src = "Instagram_Glyph_Black.png";
   instagramIcon.alt = "Instagram Icon";
   instagramIcon.classList.add("footer-icon");
   instagramIcon.addEventListener("click", function () {
