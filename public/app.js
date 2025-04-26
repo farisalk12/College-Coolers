@@ -141,64 +141,70 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="box">
                 <h1 class="title">Sign Up</h1>
                 <form id="signupForm">
-                    <div class="field">
-                    <label class="label">Name (one per room)</label>
-                    <div class="control">
-                        <input class="input" type="text" required />
-                    </div>
+                <div class="field">
+                  <label class="label"> First Name (one per room)</label>
+                  <div class="control">
+                      <input class="input" type="text" id="signup_name1" required />
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label"> Last Name (one per room)</label>
+                  <div class="control">
+                      <input class="input" type="text" id="signup_name2" required />
+                  </div>
                 </div>
                 <div class="field">
                     <label class="label">Email</label>
                     <div class="control">
-                        <input class="input" type="email" required />
+                        <input class="input" type="email" id="signup_email" required />
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Password</label>
                     <div class="control">
-                        <input class="input" type="password" required />
+                        <input class="input" type="password" id="signup_pw" required />
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Confirm Password</label>
                     <div class="control">
-                        <input class="input" type="password" required />
+                        <input class="input" type="password" id="signup_cpw" required />
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Phone Number</label>
                     <div class="control">
-                        <input class="input" type="text" required />
+                        <input class="input" type="text" id="signup_phoneno" required />
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Address</label>
                     <div class="control">
-                        <input class="input" type="text" required />
+                        <input class="input" type="text" id="signup_address required />
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Apartment Number</label>
                     <div class="control">
-                        <input class="input" type="text" required />
+                        <input class="input" type="text" id="signup_aptno" required />
                     </div>
                 </div>
                 <div class = "field">
                   <label class = "label"> Number of Roommates </label>
                   <div class = "control">
-                    <input class = "input" type = "number" required />
+                    <input class = "input" type = "number" id="signup_num_roommates" required />
                   </div>
                 </div>
                 <div class="field">
                     <label class="label">Names of Roommates (put N/A if applicable)</label>
                     <div class="control">
-                        <input class="input" type="text" />
+                        <input class="input" type="text" id="signup_names_roommates"/>
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Order Amount</label>
                     <div class="control">
-                        <div class="select">
+                        <div class="select" id="signup_order_amt">
                             <select>
                                 <option>One Cooler: $315</option>
                                 <option>Two Coolers: $400</option>
