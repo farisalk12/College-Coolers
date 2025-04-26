@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="field">
                     <label class="label">Address</label>
                     <div class="control">
-                        <input class="input" type="text" id="signup_address required />
+                        <input class="input" type="text" id="signup_address" required />
                     </div>
                 </div>
                 <div class="field">
@@ -195,11 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <input class = "input" type = "number" id="signup_num_roommates" required />
                   </div>
                 </div>
-                <div class="field">
-                    <label class="label">Names of Roommates (put N/A if applicable)</label>
-                    <div class="control">
-                        <input class="input" type="text" id="signup_names_roommates"/>
-                    </div>
+                <div class = "field" id="signup_names_roommates">
                 </div>
                 <div class="field">
                     <label class="label">Order Amount</label>
@@ -248,12 +244,37 @@ document.addEventListener("DOMContentLoaded", function () {
     signupModal.classList.remove("is-active");
   });
 
+  const signup_num_roommates = document.getElementById("signup_num_roommates");
+  const signup_names_roommates = document.getElementById(
+    "signup_names_roommates"
+  );
+  signup_num_roommates.addEventListener("input", () => {
+    signup_names_roommates.innerHTML = "";
+    let num_roommates = signup_num_roommates.value;
+    let num = 1;
+    if (num_roommates > 0) {
+      signup_names_roommates.innerHTML += `<label class = "label"> Roommates First and Last Names (optional)</label>`;
+      while (num <= num_roommates) {
+        signup_names_roommates.innerHTML += `<div class = "field">
+          <label class = "label"> Roommate ${num} Name</label>
+          <div class = "control">
+            <input class = "input" type = "text" id="signup_roommate_${num}" />
+          </div>
+        </div>`;
+        num = num + 1;
+      }
+    }
+  });
+
   signupModal
     .querySelector("#signupForm")
     .addEventListener("submit", function (event) {
       event.preventDefault();
-      userDetails.name = document.getElementById("signupName").value;
-      userDetails.email = document.getElementById("signupEmail").value;
+      userDetails.name =
+        document.getElementById("signup_name1").value +
+        " " +
+        document.getElementById("signup_name2").value;
+      userDetails.email = document.getElementById("signup_email").value;
       signinButton.style.display = "none"; // Hide Sign In button
       signupButton.style.display = "none"; // Hide Sign Up button
       addAccountIcon();
