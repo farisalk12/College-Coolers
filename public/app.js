@@ -243,11 +243,12 @@ document.addEventListener("DOMContentLoaded", function () {
   signupModal.querySelector(".modal-close").addEventListener("click", () => {
     signupModal.classList.remove("is-active");
   });
-
+  // Getting the field for number of roommates and the div for names of roommates
   const signup_num_roommates = document.getElementById("signup_num_roommates");
   const signup_names_roommates = document.getElementById(
     "signup_names_roommates"
   );
+  // Adding names of roommates fields to the sign up form dependent on the number of roommates listed
   signup_num_roommates.addEventListener("input", () => {
     signup_names_roommates.innerHTML = "";
     let num_roommates = signup_num_roommates.value;
@@ -258,14 +259,14 @@ document.addEventListener("DOMContentLoaded", function () {
         signup_names_roommates.innerHTML += `<div class = "field">
           <label class = "label"> Roommate ${num} Name</label>
           <div class = "control">
-            <input class = "input" type = "text" id="signup_roommate_${num}" />
+            <input class = "input signup_roommate_name" type = "text" id="signup_roommate_${num}" />
           </div>
         </div>`;
         num = num + 1;
       }
     }
   });
-
+  // When the user signs up
   signupModal
     .querySelector("#signupForm")
     .addEventListener("submit", function (event) {
