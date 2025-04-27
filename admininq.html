@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="navbar is-info">
+      <div class="navbar-brand">
+        <a class="navbar-item has-text-white is-size-4" id="home"
+          >COLLEGE COOLERS</a
+        >
+        <img id="logo" src="/CollegeCoolersLogo.png" style="height: 45px" />
+      </div>
+
+      <nav class="navbar-end">
+        <button class="button is-info" style="height: 100%" id="admin_page_btn">
+          Overview
+        </button>
+        <button class="button is-info" style="height: 100%" id="inqs">
+          Inquiries
+        </button>
+        <button class="button is-info" style="height: 100%" id="signin">
+          Sign In
+        </button>
+        <button class="button is-info" style="height: 100%" id="signup">
+          Sign Up
+        </button>
+        <img
+          src="favicon.png"
+          class="account-icon"
+          id="account-icon"
+          alt="Account Icon"
+        />
+      </nav>
+    </header>
+
+    <main class="section admin" id="main-content">
+      <div class="container">
+        <h1 class="title">User Inquiries</h1>
+        <div class="table-container">
+          <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Inquiry</th>
+                <th>Time Stamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>email</td>
+                <td>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                  Accusamus cupiditate omnis enim reprehenderit veritatis dicta
+                  in? Hic suscipit consequatur earum sed adipisci exercitationem
+                  voluptatum facere, et dignissimos praesentium ad veniam quae
+                  animi, dolor pariatur itaque ipsam doloribus mollitia deleniti
+                  nam expedita, ex harum similique! Aspernatur enim consequuntur
+                  nam, ea illum explicabo, itaque aut quibusdam sed, nemo
+                  obcaecati iusto aliquam reprehenderit pariatur vitae provident
+                  modi harum commodi cum similique magnam. Laboriosam maiores
+                  voluptatum, non quisquam quo tenetur placeat dolor eius
+                  architecto ipsam cupiditate debitis sunt explicabo impedit
+                  quod? Eligendi est in ut neque, mollitia reprehenderit officia
+                  laboriosam dolore, dignissimos soluta dolores.
+                </td>
+                <td>october 3rd 2025</td>
+              </tr>
+              <tr>
+                <td>email</td>
+                <td>hellow</td>
+                <td>2024</td>
+              </tr>
+              <tr>
+                <td>email</td>
+                <td>194899</td>
+                <td>April 2, 2025 at 4:43:10 PM UTC-5</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    <footer class="footer has-background-light">
+      <div class="content has-text-centered">
+        <p class="has-text-dark">COLLEGE COOLERS</p>
+        <a id="contact-us" class="has-text-dark">Contact Us</a>
+      </div>
+      <div class="modal" id="phonemodal">
+        <div class="modal-background" id="phonemodal-background"></div>
+        <div class="modal-content has-background-light" id="phonemodal-content">
+          <h1 class="is-size-4">Contact Us by Phone</h1>
+          <p>Phone Number 1:</p>
+          <p>Phone Number 2:</p>
+        </div>
+        <div class="modal-close is-large" id="phonemodal-close"></div>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
