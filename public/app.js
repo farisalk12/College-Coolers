@@ -303,116 +303,129 @@ signupModal
   .querySelector("#signupForm")
   .addEventListener("submit", function (event) {
     event.preventDefault();
-    let user_info = {
-      first_name: document.getElementById("signup_name1").value,
-      last_name: document.getElementById("signup_name2").value,
-      email: document.getElementById("signup_email").value,
-      phone_no: document.getElementById("signup_phoneno").value,
-    };
-    let returning_customer_yes = document.getElementById("returning_yes");
-    let returning_customer = true;
-    if (returning_customer_yes.checked == false) {
-      returning_customer = false;
-    }
-    let num_roommates = signup_num_roommates.value;
-    let roommates_names_elements = document.getElementsByClassName(
-      "signup_roommate_name"
-    );
-    let roommates_names = [];
-    let num = 0;
-    while (num < roommates_names_elements.length) {
-      roommates_names.push(roommates_names_elements[num].value);
-      num = num + 1;
-    }
-    if (num_roommates == 0) {
-      roommates_names = null;
-    }
-    let customer_info = {
-      address: document.getElementById("signup_address").value,
-      apt_no: document.getElementById("signup_aptno").value,
-      number_of_coolers: Number(
-        document.getElementById("signup_order_amt").value
-      ),
-      order_semester: "Fall 2025",
-      returning_customer: returning_customer,
-      names_of_roommates: roommates_names,
-      number_of_roommates: Number(num_roommates),
-      payment_made: false,
-    };
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(
-        user_info.email,
-        document.getElementById("signup_pw").value
-      )
-      .then((userCredential) => {
-        let user = userCredential.user;
-        user_info.user_id = user.uid;
-        customer_info.user_id = user.uid;
-        // firebase.auth().currentUser.sendEmailVerification().then();
-        db.collection("customer_info")
-          .add(customer_info)
-          .then(() => {
-            db.collection("users")
-              .doc(user.uid)
-              .set(user_info)
-              .then(() => {
-                userDetails.name =
-                  document.getElementById("signup_name1").value +
-                  " " +
-                  document.getElementById("signup_name2").value;
-                userDetails.email =
-                  document.getElementById("signup_email").value;
-                signinButton.style.display = "none"; // Hide Sign In button
-                signupButton.style.display = "none"; // Hide Sign Up button
-                addAccountIcon();
-                signupModal.classList.remove("is-active");
-                // Getting the signup form elements so that the values can be removed
-                let signup_form = document.getElementById("signupForm");
-                let input_num = 0;
-                let signup_form_inputs =
-                  signup_form.getElementsByTagName("input");
-                // Removing values after signup
-                while (input_num < signup_form_inputs.length) {
-                  if (signup_form_inputs[input_num].type == "radio") {
-                    console.log("Radio button");
-                    signup_form_inputs[input_num].checked = false;
-                  } else {
-                    console.log("Non-radio button");
-                    signup_form_inputs[input_num].value = "";
+    let signup_pw = document.getElementById("signup_pw").value;
+    let signup_confirm_pw = document.getElementById("signup_cpw").value;
+    if (signup_pw != signup_confirm_pw) {
+      document.getElementById("signup_error_message").innerHTML =
+        "Passwords do not match.";
+    } else {
+      let user_info = {
+        first_name: document.getElementById("signup_name1").value,
+        last_name: document.getElementById("signup_name2").value,
+        email: document.getElementById("signup_email").value,
+        phone_no: document.getElementById("signup_phoneno").value,
+        is_admin: false,
+      };
+      let returning_customer_yes = document.getElementById("returning_yes");
+      let returning_customer = true;
+      if (returning_customer_yes.checked == false) {
+        returning_customer = false;
+      }
+      let num_roommates = signup_num_roommates.value;
+      let roommates_names_elements = document.getElementsByClassName(
+        "signup_roommate_name"
+      );
+      let roommates_names = [];
+      let num = 0;
+      while (num < roommates_names_elements.length) {
+        roommates_names.push(roommates_names_elements[num].value);
+        num = num + 1;
+      }
+      if (num_roommates == 0) {
+        roommates_names = null;
+      }
+      let customer_info = {
+        address: document.getElementById("signup_address").value,
+        apt_no: document.getElementById("signup_aptno").value,
+        number_of_coolers: Number(
+          document.getElementById("signup_order_amt").value
+        ),
+        returning_customer: returning_customer,
+        names_of_roommates: roommates_names,
+        number_of_roommates: Number(num_roommates),
+        payment_made: false,
+      };
+      db.collection("order_semester_deadlines")
+        .where("order_deadline", ">=", new Date(Date.now()))
+        .orderBy("order_deadline")
+        .limit(1)
+        .get()
+        .then((data) => {
+          customer_info.order_semester = data.docs[0].data().semester;
+        });
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(
+          user_info.email,
+          document.getElementById("signup_pw").value
+        )
+        .then((userCredential) => {
+          let user = userCredential.user;
+          user_info.user_id = user.uid;
+          customer_info.user_id = user.uid;
+          // firebase.auth().currentUser.sendEmailVerification().then();
+          db.collection("customer_info")
+            .add(customer_info)
+            .then(() => {
+              db.collection("users")
+                .doc(user.uid)
+                .set(user_info)
+                .then(() => {
+                  userDetails.name =
+                    document.getElementById("signup_name1").value +
+                    " " +
+                    document.getElementById("signup_name2").value;
+                  userDetails.email =
+                    document.getElementById("signup_email").value;
+                  signinButton.style.display = "none"; // Hide Sign In button
+                  signupButton.style.display = "none"; // Hide Sign Up button
+                  addAccountIcon();
+                  signupModal.classList.remove("is-active");
+                  // Getting the signup form elements so that the values can be removed
+                  let signup_form = document.getElementById("signupForm");
+                  let input_num = 0;
+                  let signup_form_inputs =
+                    signup_form.getElementsByTagName("input");
+                  // Removing values after signup
+                  while (input_num < signup_form_inputs.length) {
+                    if (signup_form_inputs[input_num].type == "radio") {
+                      signup_form_inputs[input_num].checked = false;
+                    } else {
+                      signup_form_inputs[input_num].value = "";
+                    }
+                    input_num = input_num + 1;
                   }
-                  input_num = input_num + 1;
-                }
-                let signup_form_selects =
-                  signup_form.getElementsByClassName("select");
-                let select_num = 0;
-                // Removing values after signup
-                while (select_num < signup_form_selects.length) {
-                  signup_form_selects[select_num].value = "";
-                  select_num = select_num + 1;
-                }
-                showAccountDetails();
-              })
-              .catch((error) => {
-                user.delete().then();
-              });
-          })
-          .catch((error) => {
-            user.delete().then();
-          });
-      })
-      .catch((error) => {
-        if (error.code == "auth/email-already-in-use") {
-          document.getElementById("signup_error_message").innerHTML =
-            "This email is already in-use. Please use another email.";
-        } else if (error.code == "auth/weak-password") {
-          document.getElementById("signup_error_message").innerHTML =
-            "Please make a password that has a minimum of 6 characters.";
-        } else {
-          document.getElementById("signup_error_message").innerHTML =
-            "Sorry, there is an issue with making your account. Please try again later.";
-        }
-      });
+                  let signup_form_selects =
+                    signup_form.getElementsByClassName("select");
+                  let select_num = 0;
+                  // Removing values after signup
+                  while (select_num < signup_form_selects.length) {
+                    signup_form_selects[select_num].value = "";
+                    select_num = select_num + 1;
+                  }
+                  showAccountDetails();
+                })
+                .catch((error) => {
+                  user.delete().then();
+                });
+            })
+            .catch((error) => {
+              user.delete().then();
+            });
+        })
+        .catch((error) => {
+          if (error.code == "auth/email-already-in-use") {
+            document.getElementById("signup_error_message").innerHTML =
+              "This email is already in-use. Please use another email.";
+          } else if (error.code == "auth/weak-password") {
+            document.getElementById("signup_error_message").innerHTML =
+              "Please make a password that has a minimum of 6 characters.";
+          } else {
+            document.getElementById("signup_error_message").innerHTML =
+              "Sorry, there is an issue with making your account. Please try again later.";
+          }
+        });
+    }
   });
 
 // Sign In Modal
@@ -611,6 +624,7 @@ inquiry_send_btn.addEventListener("click", () => {
       setTimeout(() => {
         contactUsModal.classList.remove("is-active");
       }, 3000);
+      inquiry_message_elem.innerHTML = "";
     })
     .catch((error) => {
       inquiry_message_elem = document.getElementById("inquiry_message");
