@@ -1,18 +1,17 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const mainElement = document.getElementById("main-content");
-  const signinButton = document.getElementById("signin");
-  const signupButton = document.getElementById("signup");
-  const homeButton = document.getElementById("home");
-  const logo = document.getElementById("logo");
-  const nav = document.querySelector("nav");
-  const footer = document.querySelector("footer");
+const mainElement = document.getElementById("main-content");
+const signinButton = document.getElementById("signin");
+const signupButton = document.getElementById("signup");
+const homeButton = document.getElementById("home");
+const logo = document.getElementById("logo");
+const nav = document.querySelector("nav");
+const footer = document.querySelector("footer");
 
-  let userDetails = {};
-  let accountIcon = null;
+let userDetails = {};
+let accountIcon = null;
 
-  function showAccountDetails() {
-    if (!mainElement.classList.contains("admin")) {
-      mainElement.innerHTML = `
+function showAccountDetails() {
+  if (!mainElement.classList.contains("admin")) {
+    mainElement.innerHTML = `
             <div class="box has-background-info">
                 <h1 class="title">Account Details</h1>
                 <p id="acct_details_name"><strong>Name:</strong></p>
@@ -20,8 +19,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <button id="logout" class="button is-danger">Logout</button>
       </div>
         `;
-    } else {
-      mainElement.innerHTML = `
+  } else {
+    mainElement.innerHTML = `
             <div class="admin box has-background-info">
                 <h1 class="title">Account Details</h1>
                 <p id="acct_details_name"><strong>Name:</strong> </p>
@@ -29,24 +28,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 <button id="logout" class="button is-danger">Logout</button>
             </div>
         `;
-    }
-    db.collection("users")
-      .where("user_id", "==", firebase.auth().currentUser.uid)
-      .get()
-      .then((data) => {
-        data.docs.forEach((doc) => {
-          document.getElementById(
-            "acct_details_name"
-          ).innerHTML = `<strong>Name:</strong> ${
-            doc.data().first_name + " " + doc.data().last_name
-          }`;
-        });
-      });
-    document.getElementById("logout").addEventListener("click", logout);
   }
+  db.collection("users")
+    .where("user_id", "==", firebase.auth().currentUser.uid)
+    .get()
+    .then((data) => {
+      data.docs.forEach((doc) => {
+        document.getElementById(
+          "acct_details_name"
+        ).innerHTML = `<strong>Name:</strong> ${
+          doc.data().first_name + " " + doc.data().last_name
+        }`;
+      });
+    });
+  document.getElementById("logout").addEventListener("click", logout);
+}
 
-  function loadHomePage() {
-    mainElement.innerHTML = `
+function loadHomePage() {
+  mainElement.innerHTML = `
             <section class="hero is-medium is-info">
         <div class="hero-body">
           <div class="container has-text-centered">
@@ -77,24 +76,24 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
       </section>
         `;
-  }
+}
 
-  function addAccountIcon() {
-    if (!accountIcon) {
-      accountIcon = document.createElement("img");
-      accountIcon.src = "favicon.png"; // Use the favicon as the account icon
-      accountIcon.alt = "Account Icon";
-      accountIcon.classList.add("account-icon"); // Assign a CSS class
-      accountIcon.addEventListener("click", showAccountDetails);
-      nav.appendChild(accountIcon);
-    }
+function addAccountIcon() {
+  if (!accountIcon) {
+    accountIcon = document.createElement("img");
+    accountIcon.src = "favicon.png"; // Use the favicon as the account icon
+    accountIcon.alt = "Account Icon";
+    accountIcon.classList.add("account-icon"); // Assign a CSS class
+    accountIcon.addEventListener("click", showAccountDetails);
+    nav.appendChild(accountIcon);
   }
+}
 
-  const account_icon = document.getElementById("account-icon");
-  account_icon.addEventListener("click", showAccountDetails);
-  const admin_page_btn = document.getElementById("admin_page_btn");
-  admin_page_btn.addEventListener("click", () => {
-    mainElement.innerHTML = `<input class="input" placeholder="Search" />
+const account_icon = document.getElementById("account-icon");
+account_icon.addEventListener("click", showAccountDetails);
+const admin_page_btn = document.getElementById("admin_page_btn");
+admin_page_btn.addEventListener("click", () => {
+  mainElement.innerHTML = `<input class="input" placeholder="Search" />
       <table
         class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
       >
@@ -115,52 +114,58 @@ document.addEventListener("DOMContentLoaded", function () {
           <td></td>
         </tr>
       </table>`;
-  });
+});
 
-  function logout() {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        userDetails = {};
-        if (accountIcon) {
-          accountIcon.remove();
-          accountIcon = null;
-        }
-        // Removing the values from the inquiry form, if the inquiry wasn't submitted and user logged out.
-        const inquiry_form = document.getElementById("contactForm");
-        const inquiry_form_inputs = inquiry_form.getElementsByTagName("input");
-        let inquiry_input_num = 0;
-        while (inquiry_input_num < inquiry_form_inputs.length) {
-          inquiry_form_inputs[inquiry_input_num].value = "";
-          inquiry_input_num = inquiry_input_num + 1;
-        }
-        signinButton.style.display = "inline-block";
-        signupButton.style.display = "inline-block";
-        if (signupButton.classList.contains("is-hidden")) {
-          signupButton.classList.remove("is-hidden");
-        }
-        if (signinButton.classList.contains("is-hidden")) {
-          signinButton.classList.remove("is-hidden");
-        }
-        if (mainElement.classList.contains("admin")) {
-          mainElement.classList.remove("admin");
-        }
-        account_icon.classList.add("is-hidden");
-        if (mainElement.classList.contains("admin")) {
-          mainElement.classList.remove("admin");
-        }
-        if (!admin_page_btn.classList.contains("is-hidden")) {
-          admin_page_btn.classList.add("is-hidden");
-        }
-        loadHomePage();
-      });
-  }
+function logout() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      userDetails = {};
+      if (accountIcon) {
+        accountIcon.remove();
+        accountIcon = null;
+      }
+      // Removing the values from the inquiry form, if the inquiry wasn't submitted and user logged out.
+      const inquiry_form = document.getElementById("contactForm");
+      const inquiry_form_inputs = inquiry_form.getElementsByTagName("input");
+      const contact_us = document.getElementById("contact-us");
+      let inquiry_input_num = 0;
+      while (inquiry_input_num < inquiry_form_inputs.length) {
+        inquiry_form_inputs[inquiry_input_num].value = "";
+        inquiry_input_num = inquiry_input_num + 1;
+      }
+      signinButton.style.display = "inline-block";
+      signupButton.style.display = "inline-block";
+      if (signupButton.classList.contains("is-hidden")) {
+        signupButton.classList.remove("is-hidden");
+      }
+      if (signinButton.classList.contains("is-hidden")) {
+        signinButton.classList.remove("is-hidden");
+      }
+      if (mainElement.classList.contains("admin")) {
+        mainElement.classList.remove("admin");
+      }
+      account_icon.classList.add("is-hidden");
+      if (mainElement.classList.contains("admin")) {
+        mainElement.classList.remove("admin");
+      }
+      if (!admin_page_btn.classList.contains("is-hidden")) {
+        admin_page_btn.classList.add("is-hidden");
+      }
+      if (contact_us.classList.contains("is-hidden")) {
+        contact_us.classList.remove("is-hidden");
+        document.getElementById("phone_icon").classList.remove("is-hidden");
+        document.getElementById("social_icon").classList.remove("is-hidden");
+      }
+      loadHomePage();
+    });
+}
 
-  // Sign Up Modal
-  const signupModal = document.createElement("div");
-  signupModal.classList.add("modal");
-  signupModal.innerHTML = `
+// Sign Up Modal
+const signupModal = document.createElement("div");
+signupModal.classList.add("modal");
+signupModal.innerHTML = `
         <div class="modal-background"></div>
         <div class="modal-content">
             <div class="box">
@@ -260,159 +265,159 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
     `;
-  document.body.appendChild(signupModal);
+document.body.appendChild(signupModal);
 
-  signupButton.addEventListener("click", () => {
-    signupModal.classList.add("is-active");
-  });
+signupButton.addEventListener("click", () => {
+  signupModal.classList.add("is-active");
+});
 
-  signupModal.querySelector(".modal-close").addEventListener("click", () => {
-    signupModal.classList.remove("is-active");
-  });
-  // Getting the field for number of roommates and the div for names of roommates
-  const signup_num_roommates = document.getElementById("signup_num_roommates");
-  const signup_names_roommates = document.getElementById(
-    "signup_names_roommates"
-  );
-  // Adding names of roommates fields to the sign up form dependent on the number of roommates listed
-  signup_num_roommates.addEventListener("input", () => {
-    signup_names_roommates.innerHTML = "";
-    let num_roommates = signup_num_roommates.value;
-    let num = 1;
-    if (num_roommates > 0) {
-      signup_names_roommates.innerHTML += `<label class = "label"> Roommates' First and Last Names (optional)</label>`;
-      while (num <= num_roommates) {
-        signup_names_roommates.innerHTML += `<div class = "field">
+signupModal.querySelector(".modal-close").addEventListener("click", () => {
+  signupModal.classList.remove("is-active");
+});
+// Getting the field for number of roommates and the div for names of roommates
+const signup_num_roommates = document.getElementById("signup_num_roommates");
+const signup_names_roommates = document.getElementById(
+  "signup_names_roommates"
+);
+// Adding names of roommates fields to the sign up form dependent on the number of roommates listed
+signup_num_roommates.addEventListener("input", () => {
+  signup_names_roommates.innerHTML = "";
+  let num_roommates = signup_num_roommates.value;
+  let num = 1;
+  if (num_roommates > 0) {
+    signup_names_roommates.innerHTML += `<label class = "label"> Roommates' First and Last Names (optional)</label>`;
+    while (num <= num_roommates) {
+      signup_names_roommates.innerHTML += `<div class = "field">
           <label class = "label"> Roommate ${num} Name</label>
           <div class = "control">
             <input class = "input signup_roommate_name" type = "text" id="signup_roommate_${num}" />
           </div>
         </div>`;
-        num = num + 1;
-      }
+      num = num + 1;
     }
+  }
+});
+// When the user signs up
+signupModal
+  .querySelector("#signupForm")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+    let user_info = {
+      first_name: document.getElementById("signup_name1").value,
+      last_name: document.getElementById("signup_name2").value,
+      email: document.getElementById("signup_email").value,
+      phone_no: document.getElementById("signup_phoneno").value,
+    };
+    let returning_customer_yes = document.getElementById("returning_yes");
+    let returning_customer = true;
+    if (returning_customer_yes.checked == false) {
+      returning_customer = false;
+    }
+    let num_roommates = signup_num_roommates.value;
+    let roommates_names_elements = document.getElementsByClassName(
+      "signup_roommate_name"
+    );
+    let roommates_names = [];
+    let num = 0;
+    while (num < roommates_names_elements.length) {
+      roommates_names.push(roommates_names_elements[num].value);
+      num = num + 1;
+    }
+    if (num_roommates == 0) {
+      roommates_names = null;
+    }
+    let customer_info = {
+      address: document.getElementById("signup_address").value,
+      apt_no: document.getElementById("signup_aptno").value,
+      number_of_coolers: Number(
+        document.getElementById("signup_order_amt").value
+      ),
+      order_semester: "Fall 2025",
+      returning_customer: returning_customer,
+      names_of_roommates: roommates_names,
+      number_of_roommates: Number(num_roommates),
+      payment_made: false,
+    };
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(
+        user_info.email,
+        document.getElementById("signup_pw").value
+      )
+      .then((userCredential) => {
+        let user = userCredential.user;
+        user_info.user_id = user.uid;
+        customer_info.user_id = user.uid;
+        // firebase.auth().currentUser.sendEmailVerification().then();
+        db.collection("customer_info")
+          .add(customer_info)
+          .then(() => {
+            db.collection("users")
+              .doc(user.uid)
+              .set(user_info)
+              .then(() => {
+                userDetails.name =
+                  document.getElementById("signup_name1").value +
+                  " " +
+                  document.getElementById("signup_name2").value;
+                userDetails.email =
+                  document.getElementById("signup_email").value;
+                signinButton.style.display = "none"; // Hide Sign In button
+                signupButton.style.display = "none"; // Hide Sign Up button
+                addAccountIcon();
+                signupModal.classList.remove("is-active");
+                // Getting the signup form elements so that the values can be removed
+                let signup_form = document.getElementById("signupForm");
+                let input_num = 0;
+                let signup_form_inputs =
+                  signup_form.getElementsByTagName("input");
+                // Removing values after signup
+                while (input_num < signup_form_inputs.length) {
+                  if (signup_form_inputs[input_num].type == "radio") {
+                    console.log("Radio button");
+                    signup_form_inputs[input_num].checked = false;
+                  } else {
+                    console.log("Non-radio button");
+                    signup_form_inputs[input_num].value = "";
+                  }
+                  input_num = input_num + 1;
+                }
+                let signup_form_selects =
+                  signup_form.getElementsByClassName("select");
+                let select_num = 0;
+                // Removing values after signup
+                while (select_num < signup_form_selects.length) {
+                  signup_form_selects[select_num].value = "";
+                  select_num = select_num + 1;
+                }
+                showAccountDetails();
+              })
+              .catch((error) => {
+                user.delete().then();
+              });
+          })
+          .catch((error) => {
+            user.delete().then();
+          });
+      })
+      .catch((error) => {
+        if (error.code == "auth/email-already-in-use") {
+          document.getElementById("signup_error_message").innerHTML =
+            "This email is already in-use. Please use another email.";
+        } else if (error.code == "auth/weak-password") {
+          document.getElementById("signup_error_message").innerHTML =
+            "Please make a password that has a minimum of 6 characters.";
+        } else {
+          document.getElementById("signup_error_message").innerHTML =
+            "Sorry, there is an issue with making your account. Please try again later.";
+        }
+      });
   });
-  // When the user signs up
-  signupModal
-    .querySelector("#signupForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-      let user_info = {
-        first_name: document.getElementById("signup_name1").value,
-        last_name: document.getElementById("signup_name2").value,
-        email: document.getElementById("signup_email").value,
-        phone_no: document.getElementById("signup_phoneno").value,
-      };
-      let returning_customer_yes = document.getElementById("returning_yes");
-      let returning_customer = true;
-      if (returning_customer_yes.checked == false) {
-        returning_customer = false;
-      }
-      let num_roommates = signup_num_roommates.value;
-      let roommates_names_elements = document.getElementsByClassName(
-        "signup_roommate_name"
-      );
-      let roommates_names = [];
-      let num = 0;
-      while (num < roommates_names_elements.length) {
-        roommates_names.push(roommates_names_elements[num].value);
-        num = num + 1;
-      }
-      if (num_roommates == 0) {
-        roommates_names = null;
-      }
-      let customer_info = {
-        address: document.getElementById("signup_address").value,
-        apt_no: document.getElementById("signup_aptno").value,
-        number_of_coolers: Number(
-          document.getElementById("signup_order_amt").value
-        ),
-        order_semester: "Fall 2025",
-        returning_customer: returning_customer,
-        names_of_roommates: roommates_names,
-        number_of_roommates: Number(num_roommates),
-        payment_made: false,
-      };
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(
-          user_info.email,
-          document.getElementById("signup_pw").value
-        )
-        .then((userCredential) => {
-          let user = userCredential.user;
-          user_info.user_id = user.uid;
-          customer_info.user_id = user.uid;
-          // firebase.auth().currentUser.sendEmailVerification().then();
-          db.collection("customer_info")
-            .add(customer_info)
-            .then(() => {
-              db.collection("users")
-                .doc(user.uid)
-                .set(user_info)
-                .then(() => {
-                  userDetails.name =
-                    document.getElementById("signup_name1").value +
-                    " " +
-                    document.getElementById("signup_name2").value;
-                  userDetails.email =
-                    document.getElementById("signup_email").value;
-                  signinButton.style.display = "none"; // Hide Sign In button
-                  signupButton.style.display = "none"; // Hide Sign Up button
-                  addAccountIcon();
-                  signupModal.classList.remove("is-active");
-                  // Getting the signup form elements so that the values can be removed
-                  let signup_form = document.getElementById("signupForm");
-                  let input_num = 0;
-                  let signup_form_inputs =
-                    signup_form.getElementsByTagName("input");
-                  // Removing values after signup
-                  while (input_num < signup_form_inputs.length) {
-                    if (signup_form_inputs[input_num].type == "radio") {
-                      console.log("Radio button");
-                      signup_form_inputs[input_num].checked = false;
-                    } else {
-                      console.log("Non-radio button");
-                      signup_form_inputs[input_num].value = "";
-                    }
-                    input_num = input_num + 1;
-                  }
-                  let signup_form_selects =
-                    signup_form.getElementsByClassName("select");
-                  let select_num = 0;
-                  // Removing values after signup
-                  while (select_num < signup_form_selects.length) {
-                    signup_form_selects[select_num].value = "";
-                    select_num = select_num + 1;
-                  }
-                  showAccountDetails();
-                })
-                .catch((error) => {
-                  user.delete().then();
-                });
-            })
-            .catch((error) => {
-              user.delete().then();
-            });
-        })
-        .catch((error) => {
-          if (error.code == "auth/email-already-in-use") {
-            document.getElementById("signup_error_message").innerHTML =
-              "This email is already in-use. Please use another email.";
-          } else if (error.code == "auth/weak-password") {
-            document.getElementById("signup_error_message").innerHTML =
-              "Please make a password that has a minimum of 6 characters.";
-          } else {
-            document.getElementById("signup_error_message").innerHTML =
-              "Sorry, there is an issue with making your account. Please try again later.";
-          }
-        });
-    });
 
-  // Sign In Modal
-  const signinModal = document.createElement("div");
-  signinModal.classList.add("modal");
-  signinModal.innerHTML = `
+// Sign In Modal
+const signinModal = document.createElement("div");
+signinModal.classList.add("modal");
+signinModal.innerHTML = `
         <div class="modal-background"></div>
         <div class="modal-content">
             <div class="box">
@@ -441,63 +446,66 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
     `;
-  document.body.appendChild(signinModal);
+document.body.appendChild(signinModal);
 
-  signinButton.addEventListener("click", () => {
-    signinModal.classList.add("is-active");
+signinButton.addEventListener("click", () => {
+  signinModal.classList.add("is-active");
+});
+
+signinModal.querySelector(".modal-close").addEventListener("click", () => {
+  signinModal.classList.remove("is-active");
+});
+
+signinModal
+  .querySelector("#signinForm")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+    signin_email = document.getElementById("signin_email").value;
+    signin_pw = document.getElementById("signin_pw").value;
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(signin_email, signin_pw)
+      .then((credential) => {
+        let user = credential.user;
+        userDetails.email = signin_email;
+        signinButton.style.display = "none"; // Hide Sign In button
+        signupButton.style.display = "none"; // Hide Sign Up button
+        account_icon.classList.remove("is-hidden");
+        // addAccountIcon();
+        signinModal.classList.remove("is-active");
+        document.getElementById("signin_email").value = "";
+        document.getElementById("signin_pw").value = "";
+        db.collection("users")
+          .where("user_id", "==", user.uid)
+          .get()
+          .then((data) => {
+            if (data.docs[0].data().is_admin == true) {
+              admin_page_btn.classList.remove("is-hidden");
+              document.getElementById("contact-us").classList.add("is-hidden");
+              document.getElementById("phone_icon").classList.add("is-hidden");
+              document.getElementById("social_icon").classList.add("is-hidden");
+            }
+          });
+        showAccountDetails();
+      })
+      .catch((error) => {
+        if (error.code == "auth/invalid-credential") {
+          document.getElementById("signin_error_message").innerHTML =
+            "Invalid email and/or password";
+        } else {
+          document.getElementById("signin_error_message").innerHTML =
+            "Sorry, there was a problem. Please try again later.";
+        }
+      });
   });
 
-  signinModal.querySelector(".modal-close").addEventListener("click", () => {
-    signinModal.classList.remove("is-active");
-  });
+homeButton.addEventListener("click", loadHomePage);
+logo.addEventListener("click", loadHomePage);
 
-  signinModal
-    .querySelector("#signinForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-      signin_email = document.getElementById("signin_email").value;
-      signin_pw = document.getElementById("signin_pw").value;
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(signin_email, signin_pw)
-        .then((credential) => {
-          let user = credential.user;
-          userDetails.email = signin_email;
-          signinButton.style.display = "none"; // Hide Sign In button
-          signupButton.style.display = "none"; // Hide Sign Up button
-          account_icon.classList.remove("is-hidden");
-          // addAccountIcon();
-          signinModal.classList.remove("is-active");
-          document.getElementById("signin_email").value = "";
-          document.getElementById("signin_pw").value = "";
-          showAccountDetails();
-          db.collection("users")
-            .where("user_id", "==", user.uid)
-            .get()
-            .then((data) => {
-              if (data.docs[0].data().is_admin == true) {
-                admin_page_btn.classList.remove("is-hidden");
-              }
-            });
-        })
-        .catch((error) => {
-          if (error.code == "auth/invalid-credential") {
-            document.getElementById("signin_error_message").innerHTML =
-              "Invalid email and/or password";
-          } else {
-            document.getElementById("signin_error_message").innerHTML =
-              "Sorry, there was a problem. Please try again later.";
-          }
-        });
-    });
-
-  homeButton.addEventListener("click", loadHomePage);
-  logo.addEventListener("click", loadHomePage);
-
-  // Contact Us Modal
-  const contactUsModal = document.createElement("div");
-  contactUsModal.classList.add("modal");
-  contactUsModal.innerHTML = `
+// Contact Us Modal
+const contactUsModal = document.createElement("div");
+contactUsModal.classList.add("modal");
+contactUsModal.innerHTML = `
     <div class="modal-background"></div>
     <div class="modal-content">
         <div class="box">
@@ -541,104 +549,86 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
     <button class="modal-close is-large" aria-label="close"></button>
 `;
-  document.body.appendChild(contactUsModal);
-  contactUs = document.getElementById("contact-us");
-  contactUs.addEventListener("click", () => {
-    if (firebase.auth().currentUser) {
-      db.collection("users")
-        .where("user_id", "==", firebase.auth().currentUser.uid)
-        .get()
-        .then((data) => {
-          user_data = data.docs[0].data();
-          document
-            .getElementById("inquiry_name1")
-            .setAttribute("input", "disabled");
-          document
-            .getElementById("inquiry_name2")
-            .setAttribute("input", "disabled");
-          document
-            .getElementById("inquiry_email")
-            .setAttribute("input", "disabled");
-          document.getElementById("inquiry_name1").value = user_data.first_name;
-          document.getElementById("inquiry_name2").value = user_data.last_name;
-          document.getElementById("inquiry_email").value = user_data.email;
-        });
-    } else {
-      document.getElementById("inquiry_name1").removeAttribute("disabled");
-      document.getElementById("inquiry_name2").removeAttribute("disabled");
-      document.getElementById("inquiry_email").removeAttribute("disabled");
-    }
-    contactUsModal.classList.add("is-active");
-  });
-
-  contactUsModal.querySelector(".modal-close").addEventListener("click", () => {
-    // Removing the values from the inquiry form, if the inquiry modal is closed by the user.
-    const inquiry_form = document.getElementById("contactForm");
-    const inquiry_form_inputs = inquiry_form.getElementsByTagName("input");
-    let inquiry_input_num = 0;
-    while (inquiry_input_num < inquiry_form_inputs.length) {
-      inquiry_form_inputs[inquiry_input_num].value = "";
-      inquiry_input_num = inquiry_input_num + 1;
-    }
-    contactUsModal.classList.remove("is-active");
-  });
-
-  // Submitting the inquiry
-  const inquiry_send_btn = document.getElementById("inquiry_send");
-  inquiry_send_btn.addEventListener("click", () => {
-    event.preventDefault();
-    let inquiry_info = {
-      first_name: document.getElementById("inquiry_name1").value,
-      last_name: document.getElementById("inquiry_name2").value,
-      email: document.getElementById("inquiry_email").value,
-      inquiry_details: document.getElementById("inquiry_details").value,
-      timestamp: new Date(Date.now()),
-    };
-    db.collection("inquiries")
-      .add(inquiry_info)
-      .then(() => {
-        inquiry_message_elem = document.getElementById("inquiry_message");
-        inquiry_message_elem.innerHTML = "Your inquiry has been submitted.";
-        setTimeout(() => {
-          contactUsModal.classList.remove("is-active");
-        }, 3000);
-      })
-      .catch((error) => {
-        inquiry_message_elem = document.getElementById("inquiry_message");
-        inquiry_message_elem.classList.remove("has-text-success");
-        inquiry_message_elem.classList.add("has-text-danger");
-        document.getElementById("inquiry_message").innerHTML =
-          "Sorry, your inquiry was not processed. Please try again later.";
+document.body.appendChild(contactUsModal);
+contactUs = document.getElementById("contact-us");
+contactUs.addEventListener("click", () => {
+  if (firebase.auth().currentUser) {
+    db.collection("users")
+      .where("user_id", "==", firebase.auth().currentUser.uid)
+      .get()
+      .then((data) => {
+        user_data = data.docs[0].data();
+        document
+          .getElementById("inquiry_name1")
+          .setAttribute("input", "disabled");
+        document
+          .getElementById("inquiry_name2")
+          .setAttribute("input", "disabled");
+        document
+          .getElementById("inquiry_email")
+          .setAttribute("input", "disabled");
+        document.getElementById("inquiry_name1").value = user_data.first_name;
+        document.getElementById("inquiry_name2").value = user_data.last_name;
+        document.getElementById("inquiry_email").value = user_data.email;
       });
-  });
+  } else {
+    document.getElementById("inquiry_name1").removeAttribute("disabled");
+    document.getElementById("inquiry_name2").removeAttribute("disabled");
+    document.getElementById("inquiry_email").removeAttribute("disabled");
+  }
+  contactUsModal.classList.add("is-active");
+});
 
-  // Footer with icons
-  const phoneIcon = document.createElement("img");
-  phoneIcon.src = "telephone.png";
-  phoneIcon.alt = "Phone Icon";
-  phoneIcon.style = "margin: 15px";
-  phoneIcon.classList.add("footer-icon");
+contactUsModal.querySelector(".modal-close").addEventListener("click", () => {
+  // Removing the values from the inquiry form, if the inquiry modal is closed by the user.
+  const inquiry_form = document.getElementById("contactForm");
+  const inquiry_form_inputs = inquiry_form.getElementsByTagName("input");
+  let inquiry_input_num = 0;
+  while (inquiry_input_num < inquiry_form_inputs.length) {
+    inquiry_form_inputs[inquiry_input_num].value = "";
+    inquiry_input_num = inquiry_input_num + 1;
+  }
+  contactUsModal.classList.remove("is-active");
+});
 
-  const phoneModal = document.getElementById("phonemodal");
+// Submitting the inquiry
+const inquiry_send_btn = document.getElementById("inquiry_send");
+inquiry_send_btn.addEventListener("click", () => {
+  event.preventDefault();
+  let inquiry_info = {
+    first_name: document.getElementById("inquiry_name1").value,
+    last_name: document.getElementById("inquiry_name2").value,
+    email: document.getElementById("inquiry_email").value,
+    inquiry_details: document.getElementById("inquiry_details").value,
+    timestamp: new Date(Date.now()),
+  };
+  db.collection("inquiries")
+    .add(inquiry_info)
+    .then(() => {
+      inquiry_message_elem = document.getElementById("inquiry_message");
+      inquiry_message_elem.innerHTML = "Your inquiry has been submitted.";
+      setTimeout(() => {
+        contactUsModal.classList.remove("is-active");
+      }, 3000);
+    })
+    .catch((error) => {
+      inquiry_message_elem = document.getElementById("inquiry_message");
+      inquiry_message_elem.classList.remove("has-text-success");
+      inquiry_message_elem.classList.add("has-text-danger");
+      document.getElementById("inquiry_message").innerHTML =
+        "Sorry, your inquiry was not processed. Please try again later.";
+    });
+});
 
-  phoneIcon.addEventListener("click", () => {
-    phoneModal.classList.add("is-active");
-  });
+const phoneModal = document.getElementById("phonemodal");
+const phone_icon = document.getElementById("phone_icon");
+const social_icon = document.getElementById("social_icon");
 
-  const phoneModalClose = document.getElementById("phonemodal-close");
-  phoneModalClose.addEventListener("click", () => {
-    phoneModal.classList.remove("is-active");
-  });
+phone_icon.addEventListener("click", () => {
+  phoneModal.classList.add("is-active");
+});
 
-  const instagramIcon = document.createElement("img");
-  instagramIcon.src = "Instagram_Glyph_Black.png";
-  instagramIcon.alt = "Instagram Icon";
-  instagramIcon.style = "margin: 15px";
-  instagramIcon.classList.add("footer-icon");
-  instagramIcon.addEventListener("click", function () {
-    window.location.href = "https://www.instagram.com/collegecoolersuw/";
-  });
-
-  footer.appendChild(phoneIcon);
-  footer.appendChild(instagramIcon);
+const phoneModalClose = document.getElementById("phonemodal-close");
+phoneModalClose.addEventListener("click", () => {
+  phoneModal.classList.remove("is-active");
 });
