@@ -92,5 +92,26 @@
     </footer>
 
     <script src="app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
+    <script>
+      // Import the functions you need from the SDKs you need
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDCr5hNtub4mUH9aj2kK4Jk-TsBxhIQJhg",
+        authDomain: "college-coolers.firebaseapp.com",
+        projectId: "college-coolers",
+        storageBucket: "college-coolers.firebasestorage.app",
+        messagingSenderId: "718700149521",
+        appId: "1:718700149521:web:3ae026bc7f7d04f970eab0",
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
   </body>
 </html>

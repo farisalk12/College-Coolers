@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
       mainElement.innerHTML = `
             <div class="box has-background-info">
                 <h1 class="title">Account Details</h1>
-                <p><strong>Name:</strong> ${userDetails.name}</p>
+                <p id="acct_details_name"><strong>Name:</strong></p>
                 <p><strong>Email:</strong> ${userDetails.email}</p>
                 <button id="logout" class="button is-danger">Logout</button>
       </div>
@@ -24,12 +24,24 @@ document.addEventListener("DOMContentLoaded", function () {
       mainElement.innerHTML = `
             <div class="admin box has-background-info">
                 <h1 class="title">Account Details</h1>
-                <p><strong>Name:</strong> ${userDetails.name}</p>
+                <p id="acct_details_name"><strong>Name:</strong> </p>
                 <p><strong>Email:</strong> ${userDetails.email}</p>
                 <button id="logout" class="button is-danger">Logout</button>
             </div>
         `;
     }
+    db.collection("users")
+      .where("user_id", "==", firebase.auth().currentUser.uid)
+      .get()
+      .then((data) => {
+        data.docs.forEach((doc) => {
+          document.getElementById(
+            "acct_details_name"
+          ).innerHTML = `<strong>Name:</strong> ${
+            doc.data().first_name + " " + doc.data().last_name
+          }`;
+        });
+      });
     document.getElementById("logout").addEventListener("click", logout);
   }
 
@@ -106,30 +118,35 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function logout() {
-    userDetails = {};
-    if (accountIcon) {
-      accountIcon.remove();
-      accountIcon = null;
-    }
-    signinButton.style.display = "inline-block";
-    signupButton.style.display = "inline-block";
-    if (signupButton.classList.contains("is-hidden")) {
-      signupButton.classList.remove("is-hidden");
-    }
-    if (signinButton.classList.contains("is-hidden")) {
-      signinButton.classList.remove("is-hidden");
-    }
-    if (mainElement.classList.contains("admin")) {
-      mainElement.classList.remove("admin");
-    }
-    account_icon.classList.add("is-hidden");
-    if (mainElement.classList.contains("admin")) {
-      mainElement.classList.remove("admin");
-    }
-    if (!admin_page_btn.classList.contains("is-hidden")) {
-      admin_page_btn.classList.add("is-hidden");
-    }
-    loadHomePage();
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        userDetails = {};
+        if (accountIcon) {
+          accountIcon.remove();
+          accountIcon = null;
+        }
+        signinButton.style.display = "inline-block";
+        signupButton.style.display = "inline-block";
+        if (signupButton.classList.contains("is-hidden")) {
+          signupButton.classList.remove("is-hidden");
+        }
+        if (signinButton.classList.contains("is-hidden")) {
+          signinButton.classList.remove("is-hidden");
+        }
+        if (mainElement.classList.contains("admin")) {
+          mainElement.classList.remove("admin");
+        }
+        account_icon.classList.add("is-hidden");
+        if (mainElement.classList.contains("admin")) {
+          mainElement.classList.remove("admin");
+        }
+        if (!admin_page_btn.classList.contains("is-hidden")) {
+          admin_page_btn.classList.add("is-hidden");
+        }
+        loadHomePage();
+      });
   }
 
   // Sign Up Modal
@@ -186,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="field">
                     <label class="label">Apartment Number</label>
                     <div class="control">
-                        <input class="input" type="text" id="signup_aptno" required />
+                        <input class="input" type="text" id="signup_aptno" />
                     </div>
                 </div>
                 <div class = "field">
@@ -200,12 +217,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="field">
                     <label class="label">Order Amount</label>
                     <div class="control">
-                        <div class="select" id="signup_order_amt">
-                            <select>
-                                <option>One Cooler: $315</option>
-                                <option>Two Coolers: $400</option>
-                                <option>Three Coolers: $475</option>
-                                <option>Four Coolers: $540</option>
+                        <div class="select">
+                            <select id="signup_order_amt">
+                                <option value="1">One Cooler: $315</option>
+                                <option value="2">Two Coolers: $400</option>
+                                <option value="3">Three Coolers: $475</option>
+                                <option value="4">Four Coolers: $540</option>
                             </select>
                         </div>
                     </div>
@@ -214,10 +231,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     <label class="label">Are you a returning customer? (Answer YES if you already have a machine from last semester)</label>
                     <div class="control">
                         <label class="radio">
-                            <input type="radio" name="returning" value="yes" /> Yes
+                            <input type="radio" name="returning" id="returning_yes" value="yes" /> Yes
                         </label>
                         <label class="radio">
-                            <input type="radio" name="returning" value="no" /> No
+                            <input type="radio" name="returning" id="returning_no" value="no" /> No
                         </label>
                     </div>
                 </div>
@@ -230,6 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 </div>
                 </form>
+                <h2 class="has-text-danger" id="signup_error_message"> </h2>
             </div>
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
@@ -254,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let num_roommates = signup_num_roommates.value;
     let num = 1;
     if (num_roommates > 0) {
-      signup_names_roommates.innerHTML += `<label class = "label"> Roommates First and Last Names (optional)</label>`;
+      signup_names_roommates.innerHTML += `<label class = "label"> Roommates' First and Last Names (optional)</label>`;
       while (num <= num_roommates) {
         signup_names_roommates.innerHTML += `<div class = "field">
           <label class = "label"> Roommate ${num} Name</label>
@@ -271,16 +289,116 @@ document.addEventListener("DOMContentLoaded", function () {
     .querySelector("#signupForm")
     .addEventListener("submit", function (event) {
       event.preventDefault();
-      userDetails.name =
-        document.getElementById("signup_name1").value +
-        " " +
-        document.getElementById("signup_name2").value;
-      userDetails.email = document.getElementById("signup_email").value;
-      signinButton.style.display = "none"; // Hide Sign In button
-      signupButton.style.display = "none"; // Hide Sign Up button
-      addAccountIcon();
-      signupModal.classList.remove("is-active");
-      showAccountDetails();
+      let user_info = {
+        first_name: document.getElementById("signup_name1").value,
+        last_name: document.getElementById("signup_name2").value,
+        email: document.getElementById("signup_email").value,
+        phone_no: document.getElementById("signup_phoneno").value,
+      };
+      let returning_customer_yes = document.getElementById("returning_yes");
+      let returning_customer = true;
+      if (returning_customer_yes.checked == false) {
+        returning_customer = false;
+      }
+      let num_roommates = signup_num_roommates.value;
+      let roommates_names_elements = document.getElementsByClassName(
+        "signup_roommate_name"
+      );
+      let roommates_names = [];
+      let num = 0;
+      while (num < roommates_names_elements.length) {
+        roommates_names.push(roommates_names_elements[num].value);
+        num = num + 1;
+      }
+      if (num_roommates == 0) {
+        roommates_names = null;
+      }
+      let customer_info = {
+        address: document.getElementById("signup_address").value,
+        apt_no: document.getElementById("signup_aptno").value,
+        number_of_coolers: Number(
+          document.getElementById("signup_order_amt").value
+        ),
+        order_semester: "Fall 2025",
+        returning_customer: returning_customer,
+        names_of_roommates: roommates_names,
+        number_of_roommates: Number(num_roommates),
+        payment_made: false,
+      };
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(
+          user_info.email,
+          document.getElementById("signup_pw").value
+        )
+        .then((userCredential) => {
+          let user = userCredential.user;
+          user_info.user_id = user.uid;
+          customer_info.user_id = user.uid;
+          // firebase.auth().currentUser.sendEmailVerification().then();
+          db.collection("customer_info")
+            .add(customer_info)
+            .then(() => {
+              db.collection("users")
+                .doc(user.uid)
+                .set(user_info)
+                .then(() => {
+                  userDetails.name =
+                    document.getElementById("signup_name1").value +
+                    " " +
+                    document.getElementById("signup_name2").value;
+                  userDetails.email =
+                    document.getElementById("signup_email").value;
+                  signinButton.style.display = "none"; // Hide Sign In button
+                  signupButton.style.display = "none"; // Hide Sign Up button
+                  addAccountIcon();
+                  signupModal.classList.remove("is-active");
+                  // Getting the signup form elements so that the values can be removed
+                  let signup_form = document.getElementById("signupForm");
+                  let input_num = 0;
+                  let signup_form_inputs =
+                    signup_form.getElementsByTagName("input");
+                  // Removing values after signup
+                  while (input_num < signup_form_inputs.length) {
+                    if (signup_form_inputs[input_num].type == "radio") {
+                      console.log("Radio button");
+                      signup_form_inputs[input_num].checked = false;
+                    } else {
+                      console.log("Non-radio button");
+                      signup_form_inputs[input_num].value = "";
+                    }
+                    input_num = input_num + 1;
+                  }
+                  let signup_form_selects =
+                    signup_form.getElementsByClassName("select");
+                  let select_num = 0;
+                  // Removing values after signup
+                  while (select_num < signup_form_selects.length) {
+                    signup_form_selects[select_num].value = "";
+                    select_num = select_num + 1;
+                  }
+                  showAccountDetails();
+                })
+                .catch((error) => {
+                  user.delete().then();
+                });
+            })
+            .catch((error) => {
+              user.delete().then();
+            });
+        })
+        .catch((error) => {
+          if (error.code == "auth/email-already-in-use") {
+            document.getElementById("signup_error_message").innerHTML =
+              "This email is already in-use. Please use another email.";
+          } else if (error.code == "auth/weak-password") {
+            document.getElementById("signup_error_message").innerHTML =
+              "Please make a password that has a minimum of 6 characters.";
+          } else {
+            document.getElementById("signup_error_message").innerHTML =
+              "Sorry, there is an issue with making your account. Please try again later.";
+          }
+        });
     });
 
   // Sign In Modal
@@ -295,13 +413,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="field">
                         <label class="label">Email</label>
                         <div class="control">
-                            <input class="input" type="email" id="signinEmail" required>
+                            <input class="input" type="email" id="signin_email" required>
                         </div>
                     </div>
                     <div class="field">
                         <label class="label">Password</label>
                         <div class="control">
-                            <input class="input" type="password" required>
+                            <input class="input" type="password" id="signin_pw" required>
                         </div>
                     </div>
                     <div class="field">
@@ -310,6 +428,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
                 </form>
+                <h2 class="has-text-danger" id="signin_error_message"> </h2>
             </div>
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
@@ -328,14 +447,32 @@ document.addEventListener("DOMContentLoaded", function () {
     .querySelector("#signinForm")
     .addEventListener("submit", function (event) {
       event.preventDefault();
-      userDetails.email = document.getElementById("signinEmail").value;
-      userDetails.name = "User";
-      signinButton.style.display = "none"; // Hide Sign In button
-      signupButton.style.display = "none"; // Hide Sign Up button
-      account_icon.classList.remove("is-hidden");
-      // addAccountIcon();
-      signinModal.classList.remove("is-active");
-      showAccountDetails();
+      signin_email = document.getElementById("signin_email").value;
+      signin_pw = document.getElementById("signin_pw").value;
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(signin_email, signin_pw)
+        .then((credential) => {
+          let user = credential.user;
+          userDetails.email = signin_email;
+          signinButton.style.display = "none"; // Hide Sign In button
+          signupButton.style.display = "none"; // Hide Sign Up button
+          account_icon.classList.remove("is-hidden");
+          // addAccountIcon();
+          signinModal.classList.remove("is-active");
+          showAccountDetails();
+          document.getElementById("signin_email").value = "";
+          document.getElementById("signin_pw").value = "";
+        })
+        .catch((error) => {
+          if (error.code == "auth/invalid-credential") {
+            document.getElementById("signin_error_message").innerHTML =
+              "Invalid email and/or password";
+          } else {
+            document.getElementById("signin_error_message").innerHTML =
+              "Sorry, there was a problem. Please try again later.";
+          }
+        });
     });
 
   homeButton.addEventListener("click", loadHomePage);
