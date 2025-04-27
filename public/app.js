@@ -545,7 +545,7 @@ contactUsModal.innerHTML = `
                     </div>
                 </div>
             </form>
-            <h2 class="has-text-success" id="inquiry_message"> </h2>
+            <h2 class="has-text-info" id="inquiry_message"> </h2>
         </div>
     </div>
     <button class="modal-close is-large" aria-label="close"></button>
@@ -614,7 +614,7 @@ inquiry_send_btn.addEventListener("click", () => {
     })
     .catch((error) => {
       inquiry_message_elem = document.getElementById("inquiry_message");
-      inquiry_message_elem.classList.remove("has-text-success");
+      inquiry_message_elem.classList.remove("has-text-info");
       inquiry_message_elem.classList.add("has-text-danger");
       document.getElementById("inquiry_message").innerHTML =
         "Sorry, your inquiry was not processed. Please try again later.";
