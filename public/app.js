@@ -153,6 +153,7 @@ function logout() {
       if (!admin_page_btn.classList.contains("is-hidden")) {
         admin_page_btn.classList.add("is-hidden");
       }
+      // Putting the contact information back in
       if (contact_us.classList.contains("is-hidden")) {
         contact_us.classList.remove("is-hidden");
         document.getElementById("phone_icon").classList.remove("is-hidden");
