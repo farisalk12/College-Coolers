@@ -127,6 +127,14 @@ document.addEventListener("DOMContentLoaded", function () {
           accountIcon.remove();
           accountIcon = null;
         }
+        // Removing the values from the inquiry form, if the inquiry wasn't submitted and user logged out.
+        const inquiry_form = document.getElementById("contactForm");
+        const inquiry_form_inputs = inquiry_form.getElementsByTagName("input");
+        let inquiry_input_num = 0;
+        while (inquiry_input_num < inquiry_form_inputs.length) {
+          inquiry_form_inputs[inquiry_input_num].value = "";
+          inquiry_input_num = inquiry_input_num + 1;
+        }
         signinButton.style.display = "inline-block";
         signupButton.style.display = "inline-block";
         if (signupButton.classList.contains("is-hidden")) {
@@ -460,9 +468,17 @@ document.addEventListener("DOMContentLoaded", function () {
           account_icon.classList.remove("is-hidden");
           // addAccountIcon();
           signinModal.classList.remove("is-active");
-          showAccountDetails();
           document.getElementById("signin_email").value = "";
           document.getElementById("signin_pw").value = "";
+          showAccountDetails();
+          db.collection("users")
+            .where("user_id", "==", user.uid)
+            .get()
+            .then((data) => {
+              if (data.docs[0].data().is_admin == true) {
+                admin_page_btn.classList.remove("is-hidden");
+              }
+            });
         })
         .catch((error) => {
           if (error.code == "auth/invalid-credential") {
@@ -488,32 +504,39 @@ document.addEventListener("DOMContentLoaded", function () {
             <h1 class="title is-3">How can we assist you?</h1>
             <form id="contactForm">
                 <div class="field">
-                    <label class="label">Name</label>
+                    <label class="label">First Name</label>
                     <div class="control">
-                        <input class="input" type="text" required />
+                        <input class="input" type="text" id="inquiry_name1" required disabled />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Last Name</label>
+                    <div class="control">
+                        <input class="input" type="text" id="inquiry_name2" required disabled/>
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Email</label>
                     <div class="control">
-                        <input class="input" type="email" required />
+                        <input class="input" type="email" id="inquiry_email" required disabled/>
                     </div>
                 </div>
                 <div class = "field">
                     <label class = "label"> Your Question </label>
                     <div class = "control">
-                    <input class = "input" type = "textarea" required />
+                    <input class = "input" type = "textarea" id="inquiry_details" required />
                     </div>
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-info">Send</button>
+                        <button type="submit" class="button is-info" id="inquiry_send">Send</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-light">Reset</button>
+                        <button type="reset" class="button is-light" id="inquiry_reset">Reset</button>
                     </div>
                 </div>
             </form>
+            <h2 class="has-text-success" id="inquiry_message"> </h2>
         </div>
     </div>
     <button class="modal-close is-large" aria-label="close"></button>
@@ -521,11 +544,72 @@ document.addEventListener("DOMContentLoaded", function () {
   document.body.appendChild(contactUsModal);
   contactUs = document.getElementById("contact-us");
   contactUs.addEventListener("click", () => {
+    if (firebase.auth().currentUser) {
+      db.collection("users")
+        .where("user_id", "==", firebase.auth().currentUser.uid)
+        .get()
+        .then((data) => {
+          user_data = data.docs[0].data();
+          document
+            .getElementById("inquiry_name1")
+            .setAttribute("input", "disabled");
+          document
+            .getElementById("inquiry_name2")
+            .setAttribute("input", "disabled");
+          document
+            .getElementById("inquiry_email")
+            .setAttribute("input", "disabled");
+          document.getElementById("inquiry_name1").value = user_data.first_name;
+          document.getElementById("inquiry_name2").value = user_data.last_name;
+          document.getElementById("inquiry_email").value = user_data.email;
+        });
+    } else {
+      document.getElementById("inquiry_name1").removeAttribute("disabled");
+      document.getElementById("inquiry_name2").removeAttribute("disabled");
+      document.getElementById("inquiry_email").removeAttribute("disabled");
+    }
     contactUsModal.classList.add("is-active");
   });
 
   contactUsModal.querySelector(".modal-close").addEventListener("click", () => {
+    // Removing the values from the inquiry form, if the inquiry modal is closed by the user.
+    const inquiry_form = document.getElementById("contactForm");
+    const inquiry_form_inputs = inquiry_form.getElementsByTagName("input");
+    let inquiry_input_num = 0;
+    while (inquiry_input_num < inquiry_form_inputs.length) {
+      inquiry_form_inputs[inquiry_input_num].value = "";
+      inquiry_input_num = inquiry_input_num + 1;
+    }
     contactUsModal.classList.remove("is-active");
+  });
+
+  // Submitting the inquiry
+  const inquiry_send_btn = document.getElementById("inquiry_send");
+  inquiry_send_btn.addEventListener("click", () => {
+    event.preventDefault();
+    let inquiry_info = {
+      first_name: document.getElementById("inquiry_name1").value,
+      last_name: document.getElementById("inquiry_name2").value,
+      email: document.getElementById("inquiry_email").value,
+      inquiry_details: document.getElementById("inquiry_details").value,
+      timestamp: new Date(Date.now()),
+    };
+    db.collection("inquiries")
+      .add(inquiry_info)
+      .then(() => {
+        inquiry_message_elem = document.getElementById("inquiry_message");
+        inquiry_message_elem.innerHTML = "Your inquiry has been submitted.";
+        setTimeout(() => {
+          contactUsModal.classList.remove("is-active");
+        }, 3000);
+      })
+      .catch((error) => {
+        inquiry_message_elem = document.getElementById("inquiry_message");
+        inquiry_message_elem.classList.remove("has-text-success");
+        inquiry_message_elem.classList.add("has-text-danger");
+        document.getElementById("inquiry_message").innerHTML =
+          "Sorry, your inquiry was not processed. Please try again later.";
+      });
   });
 
   // Footer with icons
