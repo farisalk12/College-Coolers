@@ -263,7 +263,7 @@ signupModal.innerHTML = `
                         <button type="submit" class="button is-info">Send</button>
                     </div>
                     <div class="control">
-                        <button type="reset" class="button is-light">Reset</button>
+                        <button type="reset" class="button is-light" id="signup_reset">Reset</button>
                     </div>
                 </div>
                 </form>
@@ -315,6 +315,24 @@ signup_num_roommates.addEventListener("input", () => {
     }
   }
 });
+const signup_error_message_elem = document.getElementById(
+  "signup_error_message"
+);
+
+// When the user resets the sign-up form
+document.getElementById("signup_reset").addEventListener("click", () => {
+  let signup_semester_element = document.getElementById(
+    "signup_order_semester"
+  );
+  db.collection("order_semester_deadlines")
+    .where("order_deadline", ">=", new Date(Date.now()))
+    .orderBy("order_deadline")
+    .limit(1)
+    .get()
+    .then((data) => {
+      signup_semester_element.value = data.docs[0].data().semester;
+    });
+});
 // When the user signs up
 signupModal
   .querySelector("#signupForm")
@@ -323,8 +341,9 @@ signupModal
     let signup_pw = document.getElementById("signup_pw").value;
     let signup_confirm_pw = document.getElementById("signup_cpw").value;
     if (signup_pw != signup_confirm_pw) {
-      document.getElementById("signup_error_message").innerHTML =
-        "Passwords do not match.";
+      signup_error_message_elem.innerHTML = "Passwords do not match.";
+    } else if (signup_num_roommates.value < 0) {
+      signup_error_message_elem.innerHTML = "Invalid number of roommates.";
     } else {
       let user_info = {
         first_name: document.getElementById("signup_name1").value,
@@ -374,13 +393,14 @@ signupModal
           user_info.user_id = user.uid;
           customer_info.user_id = user.uid;
           // firebase.auth().currentUser.sendEmailVerification().then();
-          db.collection("customer_info")
-            .add(customer_info)
+          db.collection("users")
+            .doc(user.uid)
+            .set(user_info)
             .then(() => {
-              db.collection("users")
-                .doc(user.uid)
-                .set(user_info)
+              db.collection("customer_info")
+                .add(customer_info)
                 .then(() => {
+                  semester_id = "";
                   userDetails.name =
                     document.getElementById("signup_name1").value +
                     " " +
@@ -425,13 +445,13 @@ signupModal
         })
         .catch((error) => {
           if (error.code == "auth/email-already-in-use") {
-            document.getElementById("signup_error_message").innerHTML =
+            signup_error_message_elem.innerHTML =
               "This email is already in-use. Please use another email.";
           } else if (error.code == "auth/weak-password") {
-            document.getElementById("signup_error_message").innerHTML =
+            signup_error_message_elem.innerHTML =
               "Please make a password that has a minimum of 6 characters.";
           } else {
-            document.getElementById("signup_error_message").innerHTML =
+            signup_error_message_elem.innerHTML =
               "Sorry, there is an issue with making your account. Please try again later.";
           }
         });
