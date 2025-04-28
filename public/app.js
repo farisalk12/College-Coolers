@@ -208,6 +208,12 @@ signupModal.innerHTML = `
                         <input class="input" type="text" id="signup_phoneno" required />
                     </div>
                 </div>
+                 <div class="field">
+                    <label class="label">Order Semester</label>
+                    <div class="control">
+                        <input class="input" type="text" id="signup_order_semester" disabled/>
+                    </div>
+                </div>
                 <div class="field">
                     <label class="label">Address</label>
                     <div class="control">
@@ -269,6 +275,17 @@ signupModal.innerHTML = `
 document.body.appendChild(signupModal);
 
 signupButton.addEventListener("click", () => {
+  let signup_semester_element = document.getElementById(
+    "signup_order_semester"
+  );
+  db.collection("order_semester_deadlines")
+    .where("order_deadline", ">=", new Date(Date.now()))
+    .orderBy("order_deadline")
+    .limit(1)
+    .get()
+    .then((data) => {
+      signup_semester_element.value = data.docs[0].data().semester;
+    });
   signupModal.classList.add("is-active");
 });
 
@@ -344,15 +361,8 @@ signupModal
         names_of_roommates: roommates_names,
         number_of_roommates: Number(num_roommates),
         payment_made: false,
+        order_semester: document.getElementById("signup_order_semester").value,
       };
-      db.collection("order_semester_deadlines")
-        .where("order_deadline", ">=", new Date(Date.now()))
-        .orderBy("order_deadline")
-        .limit(1)
-        .get()
-        .then((data) => {
-          customer_info.order_semester = data.docs[0].data().semester;
-        });
       firebase
         .auth()
         .createUserWithEmailAndPassword(
