@@ -211,7 +211,10 @@ signupModal.innerHTML = `
                  <div class="field">
                     <label class="label">Order Semester</label>
                     <div class="control">
-                        <input class="input" type="text" id="signup_order_semester" disabled/>
+                      <div class = "select">
+                        <select id = "signup_order_semester">
+                        </select>
+                      </div>
                     </div>
                 </div>
                 <div class="field">
@@ -273,20 +276,21 @@ signupModal.innerHTML = `
         <button class="modal-close is-large" aria-label="close"></button>
     `;
 document.body.appendChild(signupModal);
+let signup_semester_element = document.getElementById("signup_order_semester");
+db.collection("order_semester_deadlines")
+  .where("order_deadline", ">=", new Date(Date.now()))
+  .orderBy("order_deadline")
+  .limit(2)
+  .get()
+  .then((data) => {
+    data.docs.forEach((doc) => {
+      signup_semester_element.innerHTML += `<option> ${
+        doc.data().semester
+      } </option>`;
+    });
+  });
 let semester_id = "";
 signupButton.addEventListener("click", () => {
-  let signup_semester_element = document.getElementById(
-    "signup_order_semester"
-  );
-  db.collection("order_semester_deadlines")
-    .where("order_deadline", ">=", new Date(Date.now()))
-    .orderBy("order_deadline")
-    .limit(1)
-    .get()
-    .then((data) => {
-      signup_semester_element.value = data.docs[0].data().semester;
-      semester_id = data.docs[0].id;
-    });
   signupModal.classList.add("is-active");
 });
 
@@ -322,17 +326,7 @@ const signup_error_message_elem = document.getElementById(
 
 // When the user resets the sign-up form
 document.getElementById("signup_reset").addEventListener("click", () => {
-  let signup_semester_element = document.getElementById(
-    "signup_order_semester"
-  );
-  db.collection("order_semester_deadlines")
-    .where("order_deadline", ">=", new Date(Date.now()))
-    .orderBy("order_deadline")
-    .limit(1)
-    .get()
-    .then((data) => {
-      signup_semester_element.value = data.docs[0].data().semester;
-    });
+  signup_names_roommates.innerHTML = "";
 });
 // When the user signs up
 signupModal
@@ -415,7 +409,7 @@ signupModal
                   signupModal.classList.remove("is-active");
                   // Getting the signup form elements so that the values can be removed
                   let signup_form = document.getElementById("signupForm");
-                  signup_num_roommates.value = 0;
+                  signup_names_roommates.innerHTML = "";
                   let input_num = 0;
                   let signup_form_inputs =
                     signup_form.getElementsByTagName("input");
