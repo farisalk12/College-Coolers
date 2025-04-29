@@ -95,7 +95,7 @@ const admin_page_btn = document.getElementById("admin_page_btn");
 admin_page_btn.addEventListener("click", () => {
   mainElement.innerHTML = `<input class="input" placeholder="Search" />
       <table
-        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" id="admin_info"
       >
         <tr>
           <th>Name</th>
@@ -114,6 +114,55 @@ admin_page_btn.addEventListener("click", () => {
           <td></td>
         </tr>
       </table>`;
+  db.collection("customer_info")
+    .get()
+    .then((data) => {
+      let admin_table = document.getElementById("admin_info");
+      admin_table.innerHTML = `<tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Address</th>
+          <th>Apt No.</th>
+          <th>Number of Roommates</th>
+          <th>Order Amount</th>
+          <th>Returning Customer</th>
+          <th>Payment Made </th>
+        </tr>`;
+      let i = 1;
+
+      data.docs.forEach((doc) => {
+        info_data = doc.data();
+        admin_table.innerHTML += `<tr id="row_${i}">
+          <td id="first_name_${i}"></td>
+            <td id="last_name_${i}"></td>
+            <td id="address_${i}"> ${info_data.address}</td>
+            <td id="apt_no_${i}">${info_data.apt_no}</td>
+            <td id="num_roommates_${i}">${info_data.number_of_roommates}</td>
+            <td id="order_amt_${i}">${info_data.number_of_coolers}</td>
+            <td id="returning_${i}">${info_data.returning_customer}</td>
+            <td> 
+              <input type="checkbox"id="payment_made_${i}" />
+              </td>
+            </tr>`;
+        let first_name_id = `first_name_${i}`;
+        let last_name_id = `last_name_${i}`;
+        db.collection("users")
+          .where("user_id", "==", info_data.user_id)
+          .get()
+          .then((user_data) => {
+            document.getElementById(first_name_id).innerHTML =
+              user_data.docs[0].data().first_name;
+            document.getElementById(last_name_id).innerHTML =
+              user_data.docs[0].data().first_name;
+          });
+        if (info_data.payment_made) {
+          document
+            .getElementById(`payment_made_${i}`)
+            .setAttribute("checked", info_data.payment_made);
+        }
+        i = i + 1;
+      });
+    });
 });
 
 function logout() {
