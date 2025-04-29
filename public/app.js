@@ -599,15 +599,9 @@ contactUs.addEventListener("click", () => {
       .get()
       .then((data) => {
         user_data = data.docs[0].data();
-        document
-          .getElementById("inquiry_name1")
-          .setAttribute("input", "disabled");
-        document
-          .getElementById("inquiry_name2")
-          .setAttribute("input", "disabled");
-        document
-          .getElementById("inquiry_email")
-          .setAttribute("input", "disabled");
+        document.getElementById("inquiry_name1").setAttribute("disabled", true);
+        document.getElementById("inquiry_name2").setAttribute("disabled", true);
+        document.getElementById("inquiry_email").setAttribute("disabled", true);
         document.getElementById("inquiry_name1").value = user_data.first_name;
         document.getElementById("inquiry_name2").value = user_data.last_name;
         document.getElementById("inquiry_email").value = user_data.email;
@@ -646,12 +640,19 @@ inquiry_send_btn.addEventListener("click", () => {
   db.collection("inquiries")
     .add(inquiry_info)
     .then(() => {
-      inquiry_message_elem = document.getElementById("inquiry_message");
+      let inquiry_message_elem = document.getElementById("inquiry_message");
       inquiry_message_elem.innerHTML = "Your inquiry has been submitted.";
       setTimeout(() => {
         contactUsModal.classList.remove("is-active");
+        const inquiry_form = document.getElementById("contactForm");
+        const inquiry_form_inputs = inquiry_form.getElementsByTagName("input");
+        let inquiry_input_num = 0;
+        while (inquiry_input_num < inquiry_form_inputs.length) {
+          inquiry_form_inputs[inquiry_input_num].value = "";
+          inquiry_input_num = inquiry_input_num + 1;
+        }
+        inquiry_message_elem.innerHTML = "";
       }, 3000);
-      inquiry_message_elem.innerHTML = "";
     })
     .catch((error) => {
       inquiry_message_elem = document.getElementById("inquiry_message");
