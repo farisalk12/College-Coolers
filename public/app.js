@@ -273,7 +273,7 @@ signupModal.innerHTML = `
         <button class="modal-close is-large" aria-label="close"></button>
     `;
 document.body.appendChild(signupModal);
-
+let semester_id = "";
 signupButton.addEventListener("click", () => {
   let signup_semester_element = document.getElementById(
     "signup_order_semester"
@@ -285,6 +285,7 @@ signupButton.addEventListener("click", () => {
     .get()
     .then((data) => {
       signup_semester_element.value = data.docs[0].data().semester;
+      semester_id = data.docs[0].id;
     });
   signupModal.classList.add("is-active");
 });
@@ -381,6 +382,7 @@ signupModal
         number_of_roommates: Number(num_roommates),
         payment_made: false,
         order_semester: document.getElementById("signup_order_semester").value,
+        order_semester_id: semester_id,
       };
       firebase
         .auth()
@@ -413,6 +415,7 @@ signupModal
                   signupModal.classList.remove("is-active");
                   // Getting the signup form elements so that the values can be removed
                   let signup_form = document.getElementById("signupForm");
+                  signup_num_roommates.value = 0;
                   let input_num = 0;
                   let signup_form_inputs =
                     signup_form.getElementsByTagName("input");
