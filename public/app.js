@@ -10,237 +10,168 @@ let userDetails = {};
 let accountIcon = null;
 
 function showAccountDetails() {
-  if (!mainElement.classList.contains("admin")) {
-    mainElement.innerHTML = `
-             <div class="box has-background-info">
-        <h1 class="title">Account Details</h1>
-        <p id="acct_details_name"><strong>Name:</strong></p>
-        <p><strong>Email:</strong> ${userDetails.email}</p>
-        <p id="acct_details_phone"><strong>Phone Number:</strong></p>
-        <p id="acct_details_address"><strong>Address:</strong></p>
-        <p id="acct_details_apt"><strong>Apartment Number:</strong></p>
-        <p id="acct_details_coolers"><strong>Number of Coolers:</strong></p>
-        <p id="acct_details_returning"><strong>Returning Customer:</strong></p>
-        <p id="acct_details_roommates"><strong>Roommates:</strong></p>
-        <p id="acct_details_order_semester"><strong>Order Semester:</strong></p>
-        <div class="buttons mt-4">
-        <button id="pay_now_btn" class="button is-white">Pay Now</button>
-        <button id="update_info_btn" class="button is-white">Update Order Info</button>
-         <button id="logout" class="button is-danger">Logout</button>
-        </div>
-      </div>
-        `;
-  } else {
-    mainElement.innerHTML = `
-            <div class="admin box has-background-info">
-                <h1 class="title">Account Details</h1>
-                <p id="acct_details_name"><strong>Name:</strong> </p>
-                <p><strong>Email:</strong> ${userDetails.email}</p>
-                <button id="logout" class="button is-danger">Logout</button>
-            </div>
-        `;
-  }
+  let isAdmin = false;
+
+  // Fetch user info first to determine admin status
   db.collection("users")
     .where("user_id", "==", firebase.auth().currentUser.uid)
     .get()
     .then((data) => {
-      data.docs.forEach((doc) => {
-        document.getElementById(
-          "acct_details_name"
-        ).innerHTML = `<strong>Name:</strong> ${
-          doc.data().first_name + " " + doc.data().last_name
-        }`;
+      const userData = data.docs[0].data();
+      isAdmin = userData.is_admin === true;
 
-        if (doc.data().phone_no) {
-          document.getElementById(
-            "acct_details_phone"
-          ).innerHTML = `<strong>Phone Number:</strong> ${doc.data().phone_no}`;
-        }
-      });
-    });
+      // BASE HTML
+      let accountHTML = `
+        <div class="box has-background-info">
+          <h1 class="title">Account Details</h1>
+          <p id="acct_details_name"><strong>Name:</strong> ${userData.first_name} ${userData.last_name}</p>
+          <p><strong>Email:</strong> ${userDetails.email}</p>
+      `;
 
-  db.collection("customer_info")
-    .where("user_id", "==", firebase.auth().currentUser.uid)
-    .get()
-    .then((data) => {
-      data.docs.forEach((doc) => {
-        const customerData = doc.data();
+      if (!isAdmin) {
+        accountHTML += `
+          <p id="acct_details_phone"><strong>Phone Number:</strong> ${userData.phone_no}</p>
+          <p id="acct_details_address"><strong>Address:</strong></p>
+          <p id="acct_details_apt"><strong>Apartment Number:</strong></p>
+          <p id="acct_details_coolers"><strong>Number of Coolers:</strong></p>
+          <p id="acct_details_returning"><strong>Returning Customer:</strong></p>
+          <p id="acct_details_roommates"><strong>Roommates:</strong></p>
+          <p id="acct_details_order_semester"><strong>Order Semester:</strong></p>
+          <div class="buttons mt-4">
+            <button id="pay_now_btn" class="button is-white">Pay Now</button>
+            <button id="update_info_btn" class="button is-white">Update Order Info</button>
+            <button id="logout" class="button is-danger">Logout</button>
+          </div>
+        `;
+      } else {
+        accountHTML += `<button id="logout" class="button is-danger mt-3">Logout</button>`;
+      }
 
-        document.getElementById(
-          "acct_details_address"
-        ).innerHTML = `<strong>Address:</strong> ${customerData.address}`;
+      accountHTML += `</div>`;
+      mainElement.innerHTML = accountHTML;
 
-        document.getElementById(
-          "acct_details_apt"
-        ).innerHTML = `<strong>Apartment Number:</strong> ${
-          customerData.apt_no || "N/A"
-        }`;
-
-        document.getElementById(
-          "acct_details_coolers"
-        ).innerHTML = `<strong>Number of Coolers:</strong> ${
-          customerData.number_of_coolers || 0
-        }`;
-
-        document.getElementById(
-          "acct_details_returning"
-        ).innerHTML = `<strong>Returning Customer:</strong> ${
-          customerData.returning_customer ? "Yes" : "No"
-        }`;
-
-        if (customerData.names_of_roommates && customerData.names_of_roommates.length > 0) {
-          document.getElementById(
-            "acct_details_roommates"
-          ).innerHTML = `<strong>Roommates:</strong> ${customerData.names_of_roommates.join(", ")}`;
-        } else {
-          document.getElementById(
-            "acct_details_roommates"
-          ).innerHTML = `<strong>Roommates:</strong> None`;
-        }
-
-        document.getElementById(
-          "acct_details_order_semester"
-        ).innerHTML = `<strong>Order Semester:</strong> ${
-          customerData.order_semester || "N/A"
-        }`;
-      });
-    });
-
-  document.getElementById("logout").addEventListener("click", logout);
-  document.getElementById("pay_now_btn").addEventListener("click", () => {
-    db.collection("customer_info")
-      .where("user_id", "==", firebase.auth().currentUser.uid)
-      .get()
-      .then((data) => {
-        if (!data.empty) {
-          const info = data.docs[0].data();
-          const coolers = info.number_of_coolers;
-  
-          const coolerRates = {
-            1: 315,
-            2: 400,
-            3: 475,
-            4: 540,
-          };
-  
-          const amount = coolerRates[coolers] || 0;
-  
-          document.getElementById("amount_due").innerText = `Amount Due: $${amount}`;
-          document.getElementById("pay_now_modal").classList.add("is-active");
-        }
-      });
-  });
-  document.getElementById("update_info_btn").addEventListener("click", () => {
- 
-    signupModal.classList.add("is-active");
- 
-    signupModal.querySelector("h1.title").innerText = "Update Your Info";
-
-    document.getElementById("signup_email").disabled = true;
-    document.getElementById("signup_pw").disabled = true;
-    document.getElementById("signup_cpw").disabled = true;
-
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((doc) => {
-        const data = doc.data();
-        document.getElementById("signup_name1").value = data.first_name;
-        document.getElementById("signup_name2").value = data.last_name;
-        document.getElementById("signup_phoneno").value = data.phone_no;
-        document.getElementById("signup_email").value = data.email;
-      });
-  
-    db.collection("customer_info")
-      .where("user_id", "==", firebase.auth().currentUser.uid)
-      .get()
-      .then((data) => {
-        const doc = data.docs[0];
-        const customerData = doc.data();
-  
-        document.getElementById("signup_address").value = customerData.address;
-        document.getElementById("signup_aptno").value = customerData.apt_no;
-        document.getElementById("signup_order_amt").value =
-          customerData.number_of_coolers;
-        document.getElementById("signup_order_semester").value =
-          customerData.order_semester;
-  
-        document.getElementById("signup_num_roommates").value =
-          customerData.number_of_roommates;
-
-        signup_num_roommates.dispatchEvent(new Event("input"));
- 
-        if (
-          customerData.names_of_roommates &&
-          customerData.names_of_roommates.length > 0
-        ) {
-          setTimeout(() => {
-            const roommateInputs = document.getElementsByClassName(
-              "signup_roommate_name"
+      // For regular users only → fetch customer info and enable buttons
+      if (!isAdmin) {
+        db.collection("customer_info")
+          .where("user_id", "==", firebase.auth().currentUser.uid)
+          .get()
+          .then((data) => {
+            const customerData = data.docs[0].data();
+            document.getElementById("acct_details_address").innerHTML = `<strong>Address:</strong> ${customerData.address}`;
+            document.getElementById("acct_details_apt").innerHTML = `<strong>Apartment Number:</strong> ${customerData.apt_no || "N/A"}`;
+            document.getElementById("acct_details_coolers").innerHTML = `<strong>Number of Coolers:</strong> ${customerData.number_of_coolers || 0}`;
+            document.getElementById("acct_details_returning").innerHTML = `<strong>Returning Customer:</strong> ${customerData.returning_customer ? "Yes" : "No"}`;
+            document.getElementById("acct_details_roommates").innerHTML = `<strong>Roommates:</strong> ${customerData.names_of_roommates?.join(", ") || "None"}`;
+            document.getElementById("acct_details_order_semester").innerHTML = `<strong>Order Semester:</strong> ${customerData.order_semester || "N/A"}`;
+            document.getElementById("acct_details_order_semester").insertAdjacentHTML(
+              "afterend",
+              `<p><strong>Payment Status:</strong> ${customerData.payment_made ? "Payment received" : "Payment not received yet"}</p>`
             );
-            customerData.names_of_roommates.forEach((name, index) => {
-              roommateInputs[index].value = name;
+          });
+
+        // Pay Now Button
+        document.getElementById("pay_now_btn").addEventListener("click", () => {
+          db.collection("customer_info")
+            .where("user_id", "==", firebase.auth().currentUser.uid)
+            .get()
+            .then((data) => {
+              const info = data.docs[0].data();
+              const coolerRates = { 1: 315, 2: 400, 3: 475, 4: 540 };
+              const amount = coolerRates[info.number_of_coolers] || 0;
+              document.getElementById("amount_due").innerText = `Amount Due: $${amount}`;
+              document.getElementById("pay_now_modal").classList.add("is-active");
             });
-          }, 100);
-        }
-  
-        if (customerData.returning_customer) {
-          document.getElementById("returning_yes").checked = true;
-        } else {
-          document.getElementById("returning_no").checked = true;
-        }
-  
-        const form = document.getElementById("signupForm");
-        form.onsubmit = (e) => {
-          e.preventDefault();
-  
-          const updatedUser = {
-            first_name: document.getElementById("signup_name1").value,
-            last_name: document.getElementById("signup_name2").value,
-            phone_no: document.getElementById("signup_phoneno").value,
-          };
-  
-          const updatedCustomer = {
-            address: document.getElementById("signup_address").value,
-            apt_no: document.getElementById("signup_aptno").value,
-            number_of_coolers: Number(
-              document.getElementById("signup_order_amt").value
-            ),
-            order_semester: document.getElementById("signup_order_semester").value,
-            number_of_roommates: Number(
-              document.getElementById("signup_num_roommates").value
-            ),
-            names_of_roommates: Array.from(
-              document.getElementsByClassName("signup_roommate_name")
-            ).map((el) => el.value),
-            returning_customer:
-              document.getElementById("returning_yes").checked || false,
-          };
-  
+        });
+
+        // Update Info Button
+        document.getElementById("update_info_btn").addEventListener("click", () => {
+          signupModal.classList.add("is-active");
+          signupModal.querySelector("h1.title").innerText = "Update Your Info";
+          document.getElementById("signup_email").disabled = true;
+          document.getElementById("signup_pw").disabled = true;
+          document.getElementById("signup_cpw").disabled = true;
+
           db.collection("users")
             .doc(firebase.auth().currentUser.uid)
-            .update(updatedUser)
-            .then(() => {
-              db.collection("customer_info")
-                .where("user_id", "==", firebase.auth().currentUser.uid)
-                .get()
-                .then((snapshot) => {
-                  if (!snapshot.empty) {
+            .get()
+            .then((doc) => {
+              const data = doc.data();
+              document.getElementById("signup_name1").value = data.first_name;
+              document.getElementById("signup_name2").value = data.last_name;
+              document.getElementById("signup_phoneno").value = data.phone_no;
+              document.getElementById("signup_email").value = data.email;
+            });
+
+          db.collection("customer_info")
+            .where("user_id", "==", firebase.auth().currentUser.uid)
+            .get()
+            .then((data) => {
+              const doc = data.docs[0];
+              const customerData = doc.data();
+
+              document.getElementById("signup_address").value = customerData.address;
+              document.getElementById("signup_aptno").value = customerData.apt_no;
+              document.getElementById("signup_order_amt").value = customerData.number_of_coolers;
+              document.getElementById("signup_order_semester").value = customerData.order_semester;
+              document.getElementById("signup_num_roommates").value = customerData.number_of_roommates;
+
+              signup_num_roommates.dispatchEvent(new Event("input"));
+
+              if (customerData.names_of_roommates?.length > 0) {
+                setTimeout(() => {
+                  const roommateInputs = document.getElementsByClassName("signup_roommate_name");
+                  customerData.names_of_roommates.forEach((name, index) => {
+                    roommateInputs[index].value = name;
+                  });
+                }, 100);
+              }
+
+              if (customerData.returning_customer) {
+                document.getElementById("returning_yes").checked = true;
+              } else {
+                document.getElementById("returning_no").checked = true;
+              }
+
+              const form = document.getElementById("signupForm");
+              form.onsubmit = (e) => {
+                e.preventDefault();
+
+                const updatedUser = {
+                  first_name: document.getElementById("signup_name1").value,
+                  last_name: document.getElementById("signup_name2").value,
+                  phone_no: document.getElementById("signup_phoneno").value,
+                };
+
+                const updatedCustomer = {
+                  address: document.getElementById("signup_address").value,
+                  apt_no: document.getElementById("signup_aptno").value,
+                  number_of_coolers: Number(document.getElementById("signup_order_amt").value),
+                  order_semester: document.getElementById("signup_order_semester").value,
+                  number_of_roommates: Number(document.getElementById("signup_num_roommates").value),
+                  names_of_roommates: Array.from(document.getElementsByClassName("signup_roommate_name")).map(el => el.value),
+                  returning_customer: document.getElementById("returning_yes").checked,
+                };
+
+                db.collection("users")
+                  .doc(firebase.auth().currentUser.uid)
+                  .update(updatedUser)
+                  .then(() => {
                     db.collection("customer_info")
-                      .doc(snapshot.docs[0].id)
+                      .doc(doc.id)
                       .update(updatedCustomer)
                       .then(() => {
                         signupModal.classList.remove("is-active");
                         loadHomePage();
                       });
-                  }
-                });
+                  });
+              };
             });
-        };
-      });
-  });
+        });
+      }
 
-  
+      // Logout works for all
+      document.getElementById("logout").addEventListener("click", logout);
+    });
 }
 
 function loadHomePage() {
