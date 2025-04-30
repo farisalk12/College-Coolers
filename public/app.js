@@ -12,11 +12,22 @@ let accountIcon = null;
 function showAccountDetails() {
   if (!mainElement.classList.contains("admin")) {
     mainElement.innerHTML = `
-            <div class="box has-background-info">
-                <h1 class="title">Account Details</h1>
-                <p id="acct_details_name"><strong>Name:</strong></p>
-                <p><strong>Email:</strong> ${userDetails.email}</p>
-                <button id="logout" class="button is-danger">Logout</button>
+             <div class="box has-background-info">
+        <h1 class="title">Account Details</h1>
+        <p id="acct_details_name"><strong>Name:</strong></p>
+        <p><strong>Email:</strong> ${userDetails.email}</p>
+        <p id="acct_details_phone"><strong>Phone Number:</strong></p>
+        <p id="acct_details_address"><strong>Address:</strong></p>
+        <p id="acct_details_apt"><strong>Apartment Number:</strong></p>
+        <p id="acct_details_coolers"><strong>Number of Coolers:</strong></p>
+        <p id="acct_details_returning"><strong>Returning Customer:</strong></p>
+        <p id="acct_details_roommates"><strong>Roommates:</strong></p>
+        <p id="acct_details_order_semester"><strong>Order Semester:</strong></p>
+        <div class="buttons mt-4">
+        <button id="pay_now_btn" class="button is-white">Pay Now</button>
+        <button id="update_info_btn" class="button is-white">Update Order Info</button>
+         <button id="logout" class="button is-danger">Logout</button>
+        </div>
       </div>
         `;
   } else {
@@ -39,9 +50,197 @@ function showAccountDetails() {
         ).innerHTML = `<strong>Name:</strong> ${
           doc.data().first_name + " " + doc.data().last_name
         }`;
+
+        if (doc.data().phone_no) {
+          document.getElementById(
+            "acct_details_phone"
+          ).innerHTML = `<strong>Phone Number:</strong> ${doc.data().phone_no}`;
+        }
       });
     });
+
+  db.collection("customer_info")
+    .where("user_id", "==", firebase.auth().currentUser.uid)
+    .get()
+    .then((data) => {
+      data.docs.forEach((doc) => {
+        const customerData = doc.data();
+
+        document.getElementById(
+          "acct_details_address"
+        ).innerHTML = `<strong>Address:</strong> ${customerData.address}`;
+
+        document.getElementById(
+          "acct_details_apt"
+        ).innerHTML = `<strong>Apartment Number:</strong> ${
+          customerData.apt_no || "N/A"
+        }`;
+
+        document.getElementById(
+          "acct_details_coolers"
+        ).innerHTML = `<strong>Number of Coolers:</strong> ${
+          customerData.number_of_coolers || 0
+        }`;
+
+        document.getElementById(
+          "acct_details_returning"
+        ).innerHTML = `<strong>Returning Customer:</strong> ${
+          customerData.returning_customer ? "Yes" : "No"
+        }`;
+
+        if (customerData.names_of_roommates && customerData.names_of_roommates.length > 0) {
+          document.getElementById(
+            "acct_details_roommates"
+          ).innerHTML = `<strong>Roommates:</strong> ${customerData.names_of_roommates.join(", ")}`;
+        } else {
+          document.getElementById(
+            "acct_details_roommates"
+          ).innerHTML = `<strong>Roommates:</strong> None`;
+        }
+
+        document.getElementById(
+          "acct_details_order_semester"
+        ).innerHTML = `<strong>Order Semester:</strong> ${
+          customerData.order_semester || "N/A"
+        }`;
+      });
+    });
+
   document.getElementById("logout").addEventListener("click", logout);
+  document.getElementById("pay_now_btn").addEventListener("click", () => {
+    db.collection("customer_info")
+      .where("user_id", "==", firebase.auth().currentUser.uid)
+      .get()
+      .then((data) => {
+        if (!data.empty) {
+          const info = data.docs[0].data();
+          const coolers = info.number_of_coolers;
+  
+          const coolerRates = {
+            1: 315,
+            2: 400,
+            3: 475,
+            4: 540,
+          };
+  
+          const amount = coolerRates[coolers] || 0;
+  
+          document.getElementById("amount_due").innerText = `Amount Due: $${amount}`;
+          document.getElementById("pay_now_modal").classList.add("is-active");
+        }
+      });
+  });
+  document.getElementById("update_info_btn").addEventListener("click", () => {
+ 
+    signupModal.classList.add("is-active");
+ 
+    signupModal.querySelector("h1.title").innerText = "Update Your Info";
+
+    document.getElementById("signup_email").disabled = true;
+    document.getElementById("signup_pw").disabled = true;
+    document.getElementById("signup_cpw").disabled = true;
+
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((doc) => {
+        const data = doc.data();
+        document.getElementById("signup_name1").value = data.first_name;
+        document.getElementById("signup_name2").value = data.last_name;
+        document.getElementById("signup_phoneno").value = data.phone_no;
+        document.getElementById("signup_email").value = data.email;
+      });
+  
+    db.collection("customer_info")
+      .where("user_id", "==", firebase.auth().currentUser.uid)
+      .get()
+      .then((data) => {
+        const doc = data.docs[0];
+        const customerData = doc.data();
+  
+        document.getElementById("signup_address").value = customerData.address;
+        document.getElementById("signup_aptno").value = customerData.apt_no;
+        document.getElementById("signup_order_amt").value =
+          customerData.number_of_coolers;
+        document.getElementById("signup_order_semester").value =
+          customerData.order_semester;
+  
+        document.getElementById("signup_num_roommates").value =
+          customerData.number_of_roommates;
+
+        signup_num_roommates.dispatchEvent(new Event("input"));
+ 
+        if (
+          customerData.names_of_roommates &&
+          customerData.names_of_roommates.length > 0
+        ) {
+          setTimeout(() => {
+            const roommateInputs = document.getElementsByClassName(
+              "signup_roommate_name"
+            );
+            customerData.names_of_roommates.forEach((name, index) => {
+              roommateInputs[index].value = name;
+            });
+          }, 100);
+        }
+  
+        if (customerData.returning_customer) {
+          document.getElementById("returning_yes").checked = true;
+        } else {
+          document.getElementById("returning_no").checked = true;
+        }
+  
+        const form = document.getElementById("signupForm");
+        form.onsubmit = (e) => {
+          e.preventDefault();
+  
+          const updatedUser = {
+            first_name: document.getElementById("signup_name1").value,
+            last_name: document.getElementById("signup_name2").value,
+            phone_no: document.getElementById("signup_phoneno").value,
+          };
+  
+          const updatedCustomer = {
+            address: document.getElementById("signup_address").value,
+            apt_no: document.getElementById("signup_aptno").value,
+            number_of_coolers: Number(
+              document.getElementById("signup_order_amt").value
+            ),
+            order_semester: document.getElementById("signup_order_semester").value,
+            number_of_roommates: Number(
+              document.getElementById("signup_num_roommates").value
+            ),
+            names_of_roommates: Array.from(
+              document.getElementsByClassName("signup_roommate_name")
+            ).map((el) => el.value),
+            returning_customer:
+              document.getElementById("returning_yes").checked || false,
+          };
+  
+          db.collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .update(updatedUser)
+            .then(() => {
+              db.collection("customer_info")
+                .where("user_id", "==", firebase.auth().currentUser.uid)
+                .get()
+                .then((snapshot) => {
+                  if (!snapshot.empty) {
+                    db.collection("customer_info")
+                      .doc(snapshot.docs[0].id)
+                      .update(updatedCustomer)
+                      .then(() => {
+                        signupModal.classList.remove("is-active");
+                        loadHomePage();
+                      });
+                  }
+                });
+            });
+        };
+      });
+  });
+
+  
 }
 
 function loadHomePage() {
@@ -126,7 +325,7 @@ function logout() {
         accountIcon.remove();
         accountIcon = null;
       }
-      // Removing the values from the inquiry form, if the inquiry wasn't submitted and user logged out.
+
       const inquiry_form = document.getElementById("contactForm");
       const inquiry_form_inputs = inquiry_form.getElementsByTagName("input");
       const contact_us = document.getElementById("contact-us");
@@ -153,13 +352,14 @@ function logout() {
       if (!admin_page_btn.classList.contains("is-hidden")) {
         admin_page_btn.classList.add("is-hidden");
       }
-      // Putting the contact information back in
+
       if (contact_us.classList.contains("is-hidden")) {
         contact_us.classList.remove("is-hidden");
         document.getElementById("phone_icon").classList.remove("is-hidden");
         document.getElementById("social_icon").classList.remove("is-hidden");
       }
       loadHomePage();
+      location.reload();
     });
 }
 
@@ -170,7 +370,7 @@ signupModal.innerHTML = `
         <div class="modal-background"></div>
         <div class="modal-content">
             <div class="box">
-                <h1 class="title">Sign Up</h1>
+                <h1 class="title">Order Sign Up</h1>
                 <form id="signupForm">
                 <div class="field">
                   <label class="label"> First Name (one per room)</label>
@@ -674,4 +874,26 @@ phone_icon.addEventListener("click", () => {
 const phoneModalClose = document.getElementById("phonemodal-close");
 phoneModalClose.addEventListener("click", () => {
   phoneModal.classList.remove("is-active");
+});
+
+const payNowModal = document.createElement("div");
+payNowModal.classList.add("modal");
+payNowModal.id = "pay_now_modal";
+payNowModal.innerHTML = `
+  <div class="modal-background"></div>
+  <div class="modal-content has-text-centered">
+    <div class="box">
+      <h2 class="title is-4">Scan to Pay</h2>
+      <h4 class="title is-6">Pay Amount due for your order through Venmo</h4>
+       <p id="amount_due" class="mb-4 has-text-weight-semibold"></p>
+      <img src="venmo.jpeg" alt="Venmo QR Code" style="max-width: 300px;" />
+            <h4 class="title is-6">@Brettlachtman</h4>
+    </div>
+  </div>
+  <button class="modal-close is-large" aria-label="close"></button>
+`;
+document.body.appendChild(payNowModal);
+
+document.querySelector("#pay_now_modal .modal-close").addEventListener("click", () => {
+  document.getElementById("pay_now_modal").classList.remove("is-active");
 });
