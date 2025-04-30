@@ -92,7 +92,7 @@ function addAccountIcon() {
 const account_icon = document.getElementById("account-icon");
 account_icon.addEventListener("click", showAccountDetails);
 const admin_page_btn = document.getElementById("admin_page_btn");
-let payment_checkboxes = document.getElementsByClassName("payment");
+
 admin_page_btn.addEventListener("click", () => {
   mainElement.innerHTML = `<input class="input" placeholder="Search" />
       <table
@@ -128,6 +128,7 @@ admin_page_btn.addEventListener("click", () => {
           <th>Order Amount</th>
           <th>Returning Customer</th>
           <th>Payment Made </th>
+          <th>Edit Info </th>
         </tr>`;
       let i = 1;
 
@@ -141,9 +142,10 @@ admin_page_btn.addEventListener("click", () => {
             <td id="num_roommates_${i}">${info_data.number_of_roommates}</td>
             <td id="order_amt_${i}">${info_data.number_of_coolers}</td>
             <td id="returning_${i}">${info_data.returning_customer}</td>
-            <td> 
-              <input type="checkbox" class="payment" id="payment_made_${i}" />
-              </td>
+            <td id="payment_made_${i}">${info_data.payment_made}</td>
+            <td id="${doc.id}">
+            <button class="button has-background-success update_info"> Edit </button>
+            </td>
             </tr>`;
         let first_name_id = `first_name_${i}`;
         let last_name_id = `last_name_${i}`;
@@ -156,24 +158,17 @@ admin_page_btn.addEventListener("click", () => {
             document.getElementById(last_name_id).innerHTML =
               user_data.docs[0].data().last_name;
           });
-        let payment_made_checkbox = document.getElementById(
-          `payment_made_${i}`
-        );
-        if (info_data.payment_made) {
-          payment_made_checkbox.setAttribute("checked", info_data.payment_made);
-        }
         i = i + 1;
       });
+      let info_update_buttons = document.getElementsByClassName("update_info");
+      let update_button_num = 0;
+      while (update_button_num < info_update_buttons.length) {
+        info_update_buttons[update_button_num].addEventListener("click", () => {
+          db.collection("customer_info");
+        });
+        update_button_num = update_button_num + 1;
+      }
     });
-  payment_checkboxes = document.getElementsByClassName("payment");
-  let j = 0;
-  while (j < payment_checkboxes.length) {
-    console.log(payment_checkboxes[j]);
-    payment_checkboxes[j].addEventListener("input", () => {
-      console.log("Change", j);
-    });
-    j = j + 1;
-  }
 });
 
 function logout() {
