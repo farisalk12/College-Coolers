@@ -88,10 +88,15 @@ function showAccountDetails() {
           customerData.returning_customer ? "Yes" : "No"
         }`;
 
-        if (customerData.names_of_roommates && customerData.names_of_roommates.length > 0) {
+        if (
+          customerData.names_of_roommates &&
+          customerData.names_of_roommates.length > 0
+        ) {
           document.getElementById(
             "acct_details_roommates"
-          ).innerHTML = `<strong>Roommates:</strong> ${customerData.names_of_roommates.join(", ")}`;
+          ).innerHTML = `<strong>Roommates:</strong> ${customerData.names_of_roommates.join(
+            ", "
+          )}`;
         } else {
           document.getElementById(
             "acct_details_roommates"
@@ -115,25 +120,26 @@ function showAccountDetails() {
         if (!data.empty) {
           const info = data.docs[0].data();
           const coolers = info.number_of_coolers;
-  
+
           const coolerRates = {
             1: 315,
             2: 400,
             3: 475,
             4: 540,
           };
-  
+
           const amount = coolerRates[coolers] || 0;
-  
-          document.getElementById("amount_due").innerText = `Amount Due: $${amount}`;
+
+          document.getElementById(
+            "amount_due"
+          ).innerText = `Amount Due: $${amount}`;
           document.getElementById("pay_now_modal").classList.add("is-active");
         }
       });
   });
   document.getElementById("update_info_btn").addEventListener("click", () => {
- 
     signupModal.classList.add("is-active");
- 
+
     signupModal.querySelector("h1.title").innerText = "Update Your Info";
 
     document.getElementById("signup_email").disabled = true;
@@ -150,26 +156,26 @@ function showAccountDetails() {
         document.getElementById("signup_phoneno").value = data.phone_no;
         document.getElementById("signup_email").value = data.email;
       });
-  
+
     db.collection("customer_info")
       .where("user_id", "==", firebase.auth().currentUser.uid)
       .get()
       .then((data) => {
         const doc = data.docs[0];
         const customerData = doc.data();
-  
+
         document.getElementById("signup_address").value = customerData.address;
         document.getElementById("signup_aptno").value = customerData.apt_no;
         document.getElementById("signup_order_amt").value =
           customerData.number_of_coolers;
         document.getElementById("signup_order_semester").value =
           customerData.order_semester;
-  
+
         document.getElementById("signup_num_roommates").value =
           customerData.number_of_roommates;
 
         signup_num_roommates.dispatchEvent(new Event("input"));
- 
+
         if (
           customerData.names_of_roommates &&
           customerData.names_of_roommates.length > 0
@@ -183,30 +189,31 @@ function showAccountDetails() {
             });
           }, 100);
         }
-  
+
         if (customerData.returning_customer) {
           document.getElementById("returning_yes").checked = true;
         } else {
           document.getElementById("returning_no").checked = true;
         }
-  
+
         const form = document.getElementById("signupForm");
         form.onsubmit = (e) => {
           e.preventDefault();
-  
+
           const updatedUser = {
             first_name: document.getElementById("signup_name1").value,
             last_name: document.getElementById("signup_name2").value,
             phone_no: document.getElementById("signup_phoneno").value,
           };
-  
+
           const updatedCustomer = {
             address: document.getElementById("signup_address").value,
             apt_no: document.getElementById("signup_aptno").value,
             number_of_coolers: Number(
               document.getElementById("signup_order_amt").value
             ),
-            order_semester: document.getElementById("signup_order_semester").value,
+            order_semester: document.getElementById("signup_order_semester")
+              .value,
             number_of_roommates: Number(
               document.getElementById("signup_num_roommates").value
             ),
@@ -216,7 +223,7 @@ function showAccountDetails() {
             returning_customer:
               document.getElementById("returning_yes").checked || false,
           };
-  
+
           db.collection("users")
             .doc(firebase.auth().currentUser.uid)
             .update(updatedUser)
@@ -239,8 +246,6 @@ function showAccountDetails() {
         };
       });
   });
-
-  
 }
 
 function loadHomePage() {
@@ -333,7 +338,6 @@ admin_page_btn.addEventListener("click", () => {
       let i = 0;
       data.docs.forEach((doc) => {
         pairings.push(doc.id);
-        console.log(pairings);
         info_data = doc.data();
         admin_table.innerHTML += `<tr id="row_${i}">
           <td id="first_name_${i}"></td>
@@ -1078,6 +1082,8 @@ payNowModal.innerHTML = `
 `;
 document.body.appendChild(payNowModal);
 
-document.querySelector("#pay_now_modal .modal-close").addEventListener("click", () => {
-  document.getElementById("pay_now_modal").classList.remove("is-active");
-});
+document
+  .querySelector("#pay_now_modal .modal-close")
+  .addEventListener("click", () => {
+    document.getElementById("pay_now_modal").classList.remove("is-active");
+  });
