@@ -330,6 +330,7 @@ admin_page_btn.addEventListener("click", () => {
           <th>Address</th>
           <th>Apt No.</th>
           <th>Number of Roommates</th>
+          <th>Names of Roommates</th>
           <th>Order Amount</th>
           <th>Returning Customer</th>
           <th>Payment Made </th>
@@ -339,12 +340,31 @@ admin_page_btn.addEventListener("click", () => {
       data.docs.forEach((doc) => {
         pairings.push(doc.id);
         info_data = doc.data();
+        let num_roommates = info_data.number_of_roommates;
+        let names_of_roommates = info_data.names_of_roommates;
+        let no_names_given = true;
+        if (names_of_roommates) {
+          let roommate_num = 0;
+          while (roommate_num < num_roommates) {
+            if (names_of_roommates[roommate_num] != "") {
+              no_names_given = false;
+              break;
+            }
+            roommate_num = roommate_num + 1;
+          }
+        } else {
+          names_of_roommates = "N/A";
+        }
+        if (no_names_given == true && num_roommates > 0) {
+          names_of_roommates = "No names given.";
+        }
         admin_table.innerHTML += `<tr id="row_${i}">
           <td id="first_name_${i}"></td>
             <td id="last_name_${i}"></td>
             <td id="address_${i}"> ${info_data.address}</td>
             <td id="apt_no_${i}">${info_data.apt_no}</td>
             <td id="num_roommates_${i}">${info_data.number_of_roommates}</td>
+            <td id="names_roommates_${i}">${names_of_roommates}</td>
             <td id="order_amt_${i}">${info_data.number_of_coolers}</td>
             <td id="returning_${i}">${info_data.returning_customer}</td>
             <td id="payment_made_${i}">${info_data.payment_made}</td>
@@ -385,6 +405,8 @@ admin_page_btn.addEventListener("click", () => {
           db.collection("customer_info")
             .get()
             .then((data) => {
+              let names_roommates_elem =
+                document.getElementById("update_names");
               data.docs.forEach((doc) => {
                 if (doc.id == pairings[index]) {
                   document.getElementById(
@@ -400,6 +422,25 @@ admin_page_btn.addEventListener("click", () => {
                       document.getElementById("update_a_email").value =
                         user_data.docs[0].data().email;
                     });
+                  let roommates_array = doc.data().names_of_roommates;
+                  if (roommates_array) {
+                    let b = 1;
+                    names_roommates_elem.innerHTML = "";
+                    doc.data().names_of_roommates.forEach((name) => {
+                      names_roommates_elem.innerHTML += `<div class="field"> <label class="label"> Roommate ${b}'s Name </label> <div class="control">
+                        <input
+                          class="input"
+                          type="text"
+                          class="update_a_name_roommate"
+                          id="update_a_name_roommate_${b}"
+                          required
+                          value="${name}"
+                        />
+                      </div> </div>`;
+                      roommate_name_id = `update_a_name_roommate_${b}`;
+                      b = b + 1;
+                    });
+                  }
                 }
               });
               let first_name_id = `first_name_${index}`;
@@ -407,6 +448,7 @@ admin_page_btn.addEventListener("click", () => {
               let address_id = `address_${index}`;
               let apt_no_id = `apt_no_${index}`;
               let num_roommates_id = `num_roommates_${index}`;
+
               let returning_id = `returning_${index}`;
               let pmt_made_id = `payment_made_${index}`;
               document.getElementById("update_a_name1").value =
@@ -474,13 +516,24 @@ admin_page_btn.addEventListener("click", () => {
     if (document.getElementById("update_a_pmt_made").value == "True") {
       payment_made_value = true;
     }
+    let roommate_name_num = 0;
+    let uploaded_updated_names = [];
+    let updated_names = document.getElementsByClassName(
+      "update_a_name_roommate"
+    );
+    while (roommate_name_num < updated_names.length) {
+      uploaded_updated_names.push(updated_names[roommate_name_num].value);
+      roommate_name_num = roommate_name_num + 1;
+    }
     db.collection("customer_info")
       .doc(cust_doc_id)
       .update({
         address: document.getElementById("update_a_address").value,
         apt_no: document.getElementById("update_a_apt_no").value,
-        number_of_roommates: document.getElementById("update_a_num_roommates")
-          .value,
+        number_of_roommates: Number(
+          document.getElementById("update_a_num_roommates").value
+        ),
+        names_of_roommates: uploaded_updated_names,
         returning_customer: returning_customer_value,
         payment_made: payment_made_value,
         order_semester: document.getElementById("update_a_order_semester")
@@ -495,7 +548,11 @@ admin_page_btn.addEventListener("click", () => {
             .getElementById("update_a_order_semester")
             .value.split(" ")[1],
       })
-      .then();
+      .then(() => {
+        document
+          .getElementById("update_cust_info_ad_modal")
+          .classList.remove("is-active");
+      });
   });
 });
 
