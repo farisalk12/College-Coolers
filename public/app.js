@@ -247,7 +247,7 @@ function showAccountDetails() {
       });
   });
 }
-
+// Loading the home page
 function loadHomePage() {
   mainElement.innerHTML = `
             <section class="hero is-medium is-info">
