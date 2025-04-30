@@ -92,6 +92,7 @@ function addAccountIcon() {
 const account_icon = document.getElementById("account-icon");
 account_icon.addEventListener("click", showAccountDetails);
 const admin_page_btn = document.getElementById("admin_page_btn");
+let payment_checkboxes = document.getElementsByClassName("payment");
 admin_page_btn.addEventListener("click", () => {
   mainElement.innerHTML = `<input class="input" placeholder="Search" />
       <table
@@ -141,7 +142,7 @@ admin_page_btn.addEventListener("click", () => {
             <td id="order_amt_${i}">${info_data.number_of_coolers}</td>
             <td id="returning_${i}">${info_data.returning_customer}</td>
             <td> 
-              <input type="checkbox"id="payment_made_${i}" />
+              <input type="checkbox" class="payment" id="payment_made_${i}" />
               </td>
             </tr>`;
         let first_name_id = `first_name_${i}`;
@@ -153,16 +154,26 @@ admin_page_btn.addEventListener("click", () => {
             document.getElementById(first_name_id).innerHTML =
               user_data.docs[0].data().first_name;
             document.getElementById(last_name_id).innerHTML =
-              user_data.docs[0].data().first_name;
+              user_data.docs[0].data().last_name;
           });
+        let payment_made_checkbox = document.getElementById(
+          `payment_made_${i}`
+        );
         if (info_data.payment_made) {
-          document
-            .getElementById(`payment_made_${i}`)
-            .setAttribute("checked", info_data.payment_made);
+          payment_made_checkbox.setAttribute("checked", info_data.payment_made);
         }
         i = i + 1;
       });
     });
+  payment_checkboxes = document.getElementsByClassName("payment");
+  let j = 0;
+  while (j < payment_checkboxes.length) {
+    console.log(payment_checkboxes[j]);
+    payment_checkboxes[j].addEventListener("input", () => {
+      console.log("Change", j);
+    });
+    j = j + 1;
+  }
 });
 
 function logout() {
@@ -425,7 +436,11 @@ signupModal
         number_of_roommates: Number(num_roommates),
         payment_made: false,
         order_semester: document.getElementById("signup_order_semester").value,
-        order_semester_id: semester_id,
+        order_semester_id: document
+          .getElementById("signup_order_semester")
+          .value.toLowerCase()
+          .split(" ")
+          .join("_"),
       };
       firebase
         .auth()
