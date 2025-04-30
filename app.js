@@ -8,64 +8,6 @@ const footer = document.querySelector("footer");
 
 let userDetails = {};
 let accountIcon = null;
-const adinq = document.getElementById("adinq");
-adinq.addEventListener("click", function () {
-  mainElement.innerHTML = `
-      <main class="section admin" id="main-content">
-        <div class="container">
-          <h1 class="title">User Inquiries</h1>
-          <div class="table-container">
-            <table class="table is-fullwidth is-striped is-hoverable">
-              <thead>
-                <tr>
-                  <th>Name</th><th>Email</th><th>Inquiry</th><th>Time Stamp</th><th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="inquiries"></tbody>
-            </table>
-          </div>
-        </div>
-      </main>
-    `;
-
-  const tbody = document.getElementById("inquiries");
-
-  // Fetch once from Firestore
-  db.collection("inquiries")
-    .get()
-    .then((querySnapshot) => {
-      tbody.innerHTML = ""; // clear any old rows
-      querySnapshot.forEach((x) => {
-        const data = x.data();
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${data.first_name}</td>
-            <td>${data.email}</td>
-            <td>${data.inquiry_details}</td>
-            <td>${data.timestamp}</td>
-            <td>
-              <button 
-                class="button is-danger is-small delete-btn"
-              >Delete</button>
-            </td>
-          `;
-        tbody.appendChild(tr);
-      });
-
-      tbody.querySelectorAll(".delete-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          db.collection("inquiries")
-            .doc(this.dataset.id)
-            .delete()
-            .catch((err) => {
-              console.error("Delete failed:", err);
-              alert("Could not delete—see console for details.");
-            });
-        });
-      });
-    })
-    .catch((err) => console.error("Error fetching inquiries:", err));
-});
 
 function showAccountDetails() {
   if (!mainElement.classList.contains("admin")) {
@@ -150,6 +92,7 @@ function addAccountIcon() {
 const account_icon = document.getElementById("account-icon");
 account_icon.addEventListener("click", showAccountDetails);
 const admin_page_btn = document.getElementById("admin_page_btn");
+
 admin_page_btn.addEventListener("click", () => {
   mainElement.innerHTML = `<input class="input" placeholder="Search" />
       <table
@@ -172,6 +115,7 @@ admin_page_btn.addEventListener("click", () => {
           <td></td>
         </tr>
       </table>`;
+  let pairings = [];
   db.collection("customer_info")
     .get()
     .then((data) => {
@@ -185,10 +129,12 @@ admin_page_btn.addEventListener("click", () => {
           <th>Order Amount</th>
           <th>Returning Customer</th>
           <th>Payment Made </th>
+          <th>Edit Info </th>
         </tr>`;
-      let i = 1;
-
+      let i = 0;
       data.docs.forEach((doc) => {
+        pairings.push(doc.id);
+        console.log(pairings);
         info_data = doc.data();
         admin_table.innerHTML += `<tr id="row_${i}">
           <td id="first_name_${i}"></td>
@@ -198,9 +144,10 @@ admin_page_btn.addEventListener("click", () => {
             <td id="num_roommates_${i}">${info_data.number_of_roommates}</td>
             <td id="order_amt_${i}">${info_data.number_of_coolers}</td>
             <td id="returning_${i}">${info_data.returning_customer}</td>
-            <td> 
-              <input type="checkbox"id="payment_made_${i}" />
-              </td>
+            <td id="payment_made_${i}">${info_data.payment_made}</td>
+            <td>
+            <button class="button has-background-success update_info" id="update_${i}"> Edit </button>
+            </td>
             </tr>`;
         let first_name_id = `first_name_${i}`;
         let last_name_id = `last_name_${i}`;
@@ -211,16 +158,208 @@ admin_page_btn.addEventListener("click", () => {
             document.getElementById(first_name_id).innerHTML =
               user_data.docs[0].data().first_name;
             document.getElementById(last_name_id).innerHTML =
-              user_data.docs[0].data().first_name;
+              user_data.docs[0].data().last_name;
           });
-        if (info_data.payment_made) {
-          document
-            .getElementById(`payment_made_${i}`)
-            .setAttribute("checked", info_data.payment_made);
-        }
         i = i + 1;
       });
+      let info_update_buttons = document.getElementsByClassName("update_info");
+      let cust_order_semester = "";
+      let num = 0;
+      while (num < info_update_buttons.length) {
+        let index = Number(info_update_buttons[num].id.split("_")[1]);
+        document.getElementById("num").innerHTML = index;
+        info_update_buttons[index].addEventListener("click", () => {
+          document
+            .getElementById("update_cust_info_ad_modal")
+            .classList.add("is-active");
+          document
+            .getElementById("update_cust_info_ad_close")
+            .addEventListener("click", () => {
+              document
+                .getElementById("update_cust_info_ad_modal")
+                .classList.remove("is-active");
+            });
+          db.collection("customer_info")
+            .get()
+            .then((data) => {
+              data.docs.forEach((doc) => {
+                if (doc.id == pairings[index]) {
+                  document.getElementById(
+                    "update_a_order_semester"
+                  ).innerHTML = `<option> ${
+                    doc.data().order_semester
+                  } </option>`;
+                  cust_order_semester = doc.data().order_semester;
+                  db.collection("users")
+                    .where("user_id", "==", doc.data().user_id)
+                    .get()
+                    .then((user_data) => {
+                      document.getElementById("update_a_email").value =
+                        user_data.docs[0].data().email;
+                    });
+                }
+              });
+              let first_name_id = `first_name_${index}`;
+              let last_name_id = `last_name_${index}`;
+              let address_id = `address_${index}`;
+              let apt_no_id = `apt_no_${index}`;
+              let num_roommates_id = `num_roommates_${index}`;
+              let returning_id = `returning_${index}`;
+              let pmt_made_id = `payment_made_${index}`;
+              document.getElementById("update_a_name1").value =
+                document.getElementById(first_name_id).innerHTML;
+              document.getElementById("update_a_name2").value =
+                document.getElementById(last_name_id).innerHTML;
+
+              db.collection("order_semester_deadlines")
+                .orderBy("order_deadline")
+                .limit(4)
+                .get()
+                .then((os_data) => {
+                  os_docs = os_data.docs;
+                  os_docs.forEach((os_doc) => {
+                    let os_doc_order_semester = os_doc.data().semester;
+                    if (cust_order_semester != os_doc_order_semester) {
+                      document.getElementById(
+                        "update_a_order_semester"
+                      ).innerHTML += `<option> ${os_doc_order_semester} </option>`;
+                    }
+                  });
+                });
+              document.getElementById("update_a_address").value =
+                document.getElementById(address_id).innerHTML;
+              document.getElementById("update_a_apt_no").value =
+                document.getElementById(apt_no_id).innerHTML;
+              document.getElementById("update_a_num_roommates").value =
+                document.getElementById(num_roommates_id).innerHTML;
+              if (Boolean(document.getElementById(returning_id))) {
+                document.getElementById(
+                  "update_a_returning"
+                ).innerHTML = `<option>True</option>
+                <option> False </option>`;
+              } else {
+                document.getElementById(
+                  "update_a_returning"
+                ).innerHTML = `<option>False</option>
+                <option> True </option>`;
+              }
+              if (Boolean(document.getElementById(pmt_made_id))) {
+                document.getElementById(
+                  "update_a_pmt_made"
+                ).innerHTML = `<option>True</option>
+                <option> False </option>`;
+              } else {
+                document.getElementById(
+                  "update_a_pmt_made"
+                ).innerHTML = `<option>False</option>
+                <option> True </option>`;
+              }
+            });
+        });
+        num = num + 1;
+      }
     });
+  document.getElementById("update_a_send").addEventListener("click", () => {
+    event.preventDefault();
+    let cust_doc_id =
+      pairings[Number(document.getElementById("num").innerHTML)];
+    let returning_customer_value = false;
+    if (document.getElementById("update_a_returning").value == "True") {
+      returning_customer_value = true;
+    }
+    let payment_made_value = false;
+    if (document.getElementById("update_a_pmt_made").value == "True") {
+      payment_made_value = true;
+    }
+    db.collection("customer_info")
+      .doc(cust_doc_id)
+      .update({
+        address: document.getElementById("update_a_address").value,
+        apt_no: document.getElementById("update_a_apt_no").value,
+        number_of_roommates: document.getElementById("update_a_num_roommates")
+          .value,
+        returning_customer: returning_customer_value,
+        payment_made: payment_made_value,
+        order_semester: document.getElementById("update_a_order_semester")
+          .value,
+        order_semester_id:
+          document
+            .getElementById("update_a_order_semester")
+            .value.split(" ")[0]
+            .toLowerCase() +
+          "_" +
+          document
+            .getElementById("update_a_order_semester")
+            .value.split(" ")[1],
+      })
+      .then();
+  });
+});
+function rev() {
+  const inq = document.getElementById("inquiries");
+  inq.innerHTML = "";
+  let inqs = [];
+
+  db.collection("inquiries")
+    .get()
+    .then((data) => {
+      let i = 0;
+      data.docs.forEach((doc) => {
+        inqs.push(doc.id);
+        const info_data = doc.data();
+        inq.innerHTML += `
+          <tr id="row_${i}">
+            <td id="first_name_${i}">${info_data.first_name}</td>
+            <td id="email_${i}">${info_data.email}</td>
+            <td id="inquiry_details_${i}">${info_data.inquiry_details}</td>
+            <td id="time_${i}">${info_data.timestamp.toDate()}</td>
+            <td>
+              <button class="button is-danger is-small"
+                      onclick="del_doc('${doc.id}')">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+        i++;
+      });
+    });
+}
+
+function del_doc(id) {
+  db.collection("inquiries")
+    .doc(id)
+    .delete()
+    .then(() => {
+      alert("inquiry deleted successfully");
+      rev();
+    });
+}
+
+const adinq = document.getElementById("adinq");
+adinq.addEventListener("click", () => {
+  mainElement.innerHTML = `
+    <main class="section admin" id="main-content">
+      <div class="container">
+        <h1 class="title">User Inquiries</h1>
+        <div class="table-container">
+          <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Inquiry</th>
+                <th>Time Stamp</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="inquiries"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>`;
+
+  rev();
 });
 
 function logout() {
@@ -486,7 +625,11 @@ signupModal
         number_of_roommates: Number(num_roommates),
         payment_made: false,
         order_semester: document.getElementById("signup_order_semester").value,
-        order_semester_id: semester_id,
+        order_semester_id: document
+          .getElementById("signup_order_semester")
+          .value.toLowerCase()
+          .split(" ")
+          .join("_"),
       };
       firebase
         .auth()
@@ -632,6 +775,7 @@ signinModal
           .then((data) => {
             if (data.docs[0].data().is_admin == true) {
               admin_page_btn.classList.remove("is-hidden");
+              adinq.classList.remove("is-hidden");
               document.getElementById("contact-us").classList.add("is-hidden");
               document.getElementById("phone_icon").classList.add("is-hidden");
               document.getElementById("social_icon").classList.add("is-hidden");

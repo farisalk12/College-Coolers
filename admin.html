@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>College Coolers</title>
+    <!-- Add Bulma CDN link -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
@@ -17,14 +18,21 @@
         <a class="navbar-item has-text-white is-size-4" id="home"
           >COLLEGE COOLERS</a
         >
-        <img id="logo" src="/CollegeCoolersLogo.png" style="height: 45px" />
+        <img id="logo" src="CollegeCoolersLogo.png" style="height: 45px" />
       </div>
-
       <nav class="navbar-end">
-        <button class="button is-info" style="height: 100%" id="admin_page_btn">
+        <button
+          class="button is-info is-hidden"
+          style="height: 100%"
+          id="admin_page_btn"
+        >
           Overview
         </button>
-        <button class="button is-info" style="height: 100%" id="adinq">
+        <button
+          class="button is-info is-hidden"
+          style="height: 100%"
+          id="adinq"
+        >
           Inquiries
         </button>
         <button class="button is-info" style="height: 100%" id="signin">
@@ -35,39 +43,202 @@
         </button>
         <img
           src="favicon.png"
-          class="account-icon"
+          class="account-icon is-hidden"
           id="account-icon"
           alt="Account Icon"
         />
       </nav>
+      <div class="modal" id="update_cust_info_ad_modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <div class="box">
+            <h2 class="title">Update Information</h2>
+            <p class="subtitle">
+              For dropdowns, the first value is the user's current status.
+            </p>
+            <p id="num" class="is-hidden"></p>
+            <form id="update_cust_info_ad_form">
+              <div class="field">
+                <label class="label"> First Name </label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    id="update_a_name1"
+                    required
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label"> Last Name </label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    id="update_a_name2"
+                    required
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Email</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="email"
+                    id="update_a_email"
+                    required
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Order Semester</label>
+                <div class="control">
+                  <div class="select">
+                    <select id="update_a_order_semester"></select>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Address</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    id="update_a_address"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Apartment Number</label>
+                <div class="control">
+                  <input class="input" type="text" id="update_a_apt_no" />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label"> Number of Roommates </label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="number"
+                    id="update_a_num_roommates"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label"> Returning Customer</label>
+                <div class="select">
+                  <select id="update_a_returning"></select>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label"> Payment Made </label>
+                <div class="select">
+                  <select id="update_a_pmt_made"></select>
+                </div>
+              </div>
+              <div class="field is-grouped">
+                <div class="control">
+                  <button
+                    type="submit"
+                    class="button is-info"
+                    id="update_a_send"
+                  >
+                    Send
+                  </button>
+                </div>
+                <div class="control">
+                  <button
+                    type="reset"
+                    class="button is-light"
+                    id="update_a_reset"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <button
+            class="modal-close is-large"
+            id="update_cust_info_ad_close"
+            aria-label="close"
+          ></button>
+        </div>
+      </div>
     </header>
 
-    <main class="section admin" id="main-content">
-      <input class="input" placeholder="Search" />
-      <table
-        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-      >
-        <tr>
-          <th>Name</th>
-          <th>Building Name</th>
-          <th>Room No.</th>
-          <th>Number of Roommates</th>
-          <th>Order Amount</th>
-          <th>Returning Customer</th>
-        </tr>
-      </table>
+    <main id="main-content" class="section">
+      <section class="hero is-medium is-info">
+        <div class="hero-body">
+          <div class="container has-text-centered">
+            <h1 class="title">Welcome to College Coolers</h1>
+            <p class="subtitle">
+              We deliver water coolers every semester across apartments in
+              Madison, WI.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="info">
+        <div class="semester_info box">
+          For the last 18 years we have provided the highest quality water to
+          students across UW Madison Campus. We deliver water coolers right to
+          your door every single week, ensuring you stray hydrated all semester
+          long. All you have to do is create an account with your name and phone
+          number, where you are currently living, and the number of coolers you
+          will need each week. For new customers, we will provide you with the
+          dispensing machine, free of charge!
+        </div>
+        <div class="semester_info box">
+          Spring 2025 Rates:
+          <p>One Cooler: $315</p>
+          <p>Two Coolers: $400</p>
+          <p>Three Coolers: $475</p>
+          <p>Four Coolers: $540</p>
+        </div>
+      </section>
     </main>
+
     <footer class="footer has-background-light">
       <div class="content has-text-centered">
         <p class="has-text-dark">COLLEGE COOLERS</p>
         <a id="contact-us" class="has-text-dark">Contact Us</a>
       </div>
+
+      <img
+        src="telephone.png"
+        alt="Phone Numbers"
+        id="phone_icon"
+        class="m-3"
+        height="30px"
+        width="30px"
+      />
+      <a href="https://www.instagram.com/collegecoolersuw/">
+        <img
+          src="Instagram_Glyph_Black.png"
+          alt="Instagram"
+          id="social_icon"
+          href="https://www.instagram.com/collegecoolersuw/"
+          class="m-3"
+          height="30px"
+          width="30px"
+        />
+      </a>
+
       <div class="modal" id="phonemodal">
         <div class="modal-background" id="phonemodal-background"></div>
         <div class="modal-content has-background-light" id="phonemodal-content">
           <h1 class="is-size-4">Contact Us by Phone</h1>
-          <p>Phone Number 1:</p>
-          <p>Phone Number 2:</p>
+          <p>Alex Zeh: (631) 923-8038</p>
+          <p>Brett Lachtman: (914) 275-8933</p>
+          <p>Jake Stern: (908) 770-6101</p>
+          <p>Matt Weiler: (914) 539-6527</p>
         </div>
         <div class="modal-close is-large" id="phonemodal-close"></div>
       </div>
