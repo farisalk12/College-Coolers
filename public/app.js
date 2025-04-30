@@ -10,40 +10,214 @@ let userDetails = {};
 let accountIcon = null;
 
 function showAccountDetails() {
-  if (!mainElement.classList.contains("admin")) {
-    mainElement.innerHTML = `
-            <div class="box has-background-info">
-                <h1 class="title">Account Details</h1>
-                <p id="acct_details_name"><strong>Name:</strong></p>
-                <p><strong>Email:</strong> ${userDetails.email}</p>
-                <button id="logout" class="button is-danger">Logout</button>
-      </div>
-        `;
-  } else {
-    mainElement.innerHTML = `
-            <div class="admin box has-background-info">
-                <h1 class="title">Account Details</h1>
-                <p id="acct_details_name"><strong>Name:</strong> </p>
-                <p><strong>Email:</strong> ${userDetails.email}</p>
-                <button id="logout" class="button is-danger">Logout</button>
-            </div>
-        `;
-  }
+  let isAdmin = false;
+
   db.collection("users")
     .where("user_id", "==", firebase.auth().currentUser.uid)
     .get()
     .then((data) => {
-      data.docs.forEach((doc) => {
-        document.getElementById(
-          "acct_details_name"
-        ).innerHTML = `<strong>Name:</strong> ${
-          doc.data().first_name + " " + doc.data().last_name
-        }`;
-      });
-    });
-  document.getElementById("logout").addEventListener("click", logout);
-}
+      const userData = data.docs[0].data();
+      isAdmin = userData.is_admin === true;
 
+      let accountHTML = `
+        <div class="box has-background-info">
+          <h1 class="title">Account Details</h1>
+          <p id="acct_details_name"><strong>Name:</strong> ${userData.first_name} ${userData.last_name}</p>
+          <p><strong>Email:</strong> ${userDetails.email}</p>
+      `;
+
+      if (!isAdmin) {
+        accountHTML += `
+          <p id="acct_details_phone"><strong>Phone Number:</strong> ${userData.phone_no}</p>
+          <p id="acct_details_address"><strong>Address:</strong></p>
+          <p id="acct_details_apt"><strong>Apartment Number:</strong></p>
+          <p id="acct_details_coolers"><strong>Number of Coolers:</strong></p>
+          <p id="acct_details_returning"><strong>Returning Customer:</strong></p>
+          <p id="acct_details_roommates"><strong>Roommates:</strong></p>
+          <p id="acct_details_order_semester"><strong>Order Semester:</strong></p>
+          <div class="buttons mt-4">
+            <button id="pay_now_btn" class="button is-white">Pay Now</button>
+            <button id="update_info_btn" class="button is-white">Update Order Info</button>
+            <button id="logout" class="button is-danger">Logout</button>
+          </div>
+        `;
+      } else {
+        accountHTML += `<button id="logout" class="button is-danger mt-3">Logout</button>`;
+      }
+
+      accountHTML += `</div>`;
+      mainElement.innerHTML = accountHTML;
+
+      if (!isAdmin) {
+        db.collection("customer_info")
+          .where("user_id", "==", firebase.auth().currentUser.uid)
+          .get()
+          .then((data) => {
+            const customerData = data.docs[0].data();
+            document.getElementById(
+              "acct_details_address"
+            ).innerHTML = `<strong>Address:</strong> ${customerData.address}`;
+            document.getElementById(
+              "acct_details_apt"
+            ).innerHTML = `<strong>Apartment Number:</strong> ${
+              customerData.apt_no || "N/A"
+            }`;
+            document.getElementById(
+              "acct_details_coolers"
+            ).innerHTML = `<strong>Number of Coolers:</strong> ${
+              customerData.number_of_coolers || 0
+            }`;
+            document.getElementById(
+              "acct_details_returning"
+            ).innerHTML = `<strong>Returning Customer:</strong> ${
+              customerData.returning_customer ? "Yes" : "No"
+            }`;
+            document.getElementById(
+              "acct_details_roommates"
+            ).innerHTML = `<strong>Roommates:</strong> ${
+              customerData.names_of_roommates?.join(", ") || "None"
+            }`;
+            document.getElementById(
+              "acct_details_order_semester"
+            ).innerHTML = `<strong>Order Semester:</strong> ${
+              customerData.order_semester || "N/A"
+            }`;
+            document
+              .getElementById("acct_details_order_semester")
+              .insertAdjacentHTML(
+                "afterend",
+                `<p><strong>Payment Status:</strong> ${
+                  customerData.payment_made
+                    ? "Payment received"
+                    : "Payment not received yet"
+                }</p>`
+              );
+          });
+
+        document.getElementById("pay_now_btn").addEventListener("click", () => {
+          db.collection("customer_info")
+            .where("user_id", "==", firebase.auth().currentUser.uid)
+            .get()
+            .then((data) => {
+              const info = data.docs[0].data();
+              const coolerRates = { 1: 315, 2: 400, 3: 475, 4: 540 };
+              const amount = coolerRates[info.number_of_coolers] || 0;
+              document.getElementById(
+                "amount_due"
+              ).innerText = `Amount Due: $${amount}`;
+              document
+                .getElementById("pay_now_modal")
+                .classList.add("is-active");
+            });
+        });
+
+        document
+          .getElementById("update_info_btn")
+          .addEventListener("click", () => {
+            signupModal.classList.add("is-active");
+            signupModal.querySelector("h1.title").innerText =
+              "Update Your Info";
+            document.getElementById("signup_email").disabled = true;
+            document.getElementById("signup_pw").disabled = true;
+            document.getElementById("signup_cpw").disabled = true;
+
+            db.collection("users")
+              .doc(firebase.auth().currentUser.uid)
+              .get()
+              .then((doc) => {
+                const data = doc.data();
+                document.getElementById("signup_name1").value = data.first_name;
+                document.getElementById("signup_name2").value = data.last_name;
+                document.getElementById("signup_phoneno").value = data.phone_no;
+                document.getElementById("signup_email").value = data.email;
+              });
+
+            db.collection("customer_info")
+              .where("user_id", "==", firebase.auth().currentUser.uid)
+              .get()
+              .then((data) => {
+                const doc = data.docs[0];
+                const customerData = doc.data();
+
+                document.getElementById("signup_address").value =
+                  customerData.address;
+                document.getElementById("signup_aptno").value =
+                  customerData.apt_no;
+                document.getElementById("signup_order_amt").value =
+                  customerData.number_of_coolers;
+                document.getElementById("signup_order_semester").value =
+                  customerData.order_semester;
+                document.getElementById("signup_num_roommates").value =
+                  customerData.number_of_roommates;
+
+                signup_num_roommates.dispatchEvent(new Event("input"));
+
+                if (customerData.names_of_roommates?.length > 0) {
+                  setTimeout(() => {
+                    const roommateInputs = document.getElementsByClassName(
+                      "signup_roommate_name"
+                    );
+                    customerData.names_of_roommates.forEach((name, index) => {
+                      roommateInputs[index].value = name;
+                    });
+                  }, 100);
+                }
+
+                if (customerData.returning_customer) {
+                  document.getElementById("returning_yes").checked = true;
+                } else {
+                  document.getElementById("returning_no").checked = true;
+                }
+
+                const form = document.getElementById("signupForm");
+                form.onsubmit = (e) => {
+                  e.preventDefault();
+
+                  const updatedUser = {
+                    first_name: document.getElementById("signup_name1").value,
+                    last_name: document.getElementById("signup_name2").value,
+                    phone_no: document.getElementById("signup_phoneno").value,
+                  };
+
+                  const updatedCustomer = {
+                    address: document.getElementById("signup_address").value,
+                    apt_no: document.getElementById("signup_aptno").value,
+                    number_of_coolers: Number(
+                      document.getElementById("signup_order_amt").value
+                    ),
+                    order_semester: document.getElementById(
+                      "signup_order_semester"
+                    ).value,
+                    number_of_roommates: Number(
+                      document.getElementById("signup_num_roommates").value
+                    ),
+                    names_of_roommates: Array.from(
+                      document.getElementsByClassName("signup_roommate_name")
+                    ).map((el) => el.value),
+                    returning_customer:
+                      document.getElementById("returning_yes").checked,
+                  };
+
+                  db.collection("users")
+                    .doc(firebase.auth().currentUser.uid)
+                    .update(updatedUser)
+                    .then(() => {
+                      db.collection("customer_info")
+                        .doc(doc.id)
+                        .update(updatedCustomer)
+                        .then(() => {
+                          signupModal.classList.remove("is-active");
+                          loadHomePage();
+                        });
+                    });
+                };
+              });
+          });
+      }
+
+      document.getElementById("logout").addEventListener("click", logout);
+    });
+}
 function loadHomePage() {
   mainElement.innerHTML = `
             <section class="hero is-medium is-info">
@@ -126,6 +300,7 @@ admin_page_btn.addEventListener("click", () => {
           <th>Address</th>
           <th>Apt No.</th>
           <th>Number of Roommates</th>
+          <th>Names of Roommates</th>
           <th>Order Amount</th>
           <th>Returning Customer</th>
           <th>Payment Made </th>
@@ -134,14 +309,32 @@ admin_page_btn.addEventListener("click", () => {
       let i = 0;
       data.docs.forEach((doc) => {
         pairings.push(doc.id);
-        console.log(pairings);
         info_data = doc.data();
+        let num_roommates = info_data.number_of_roommates;
+        let names_of_roommates = info_data.names_of_roommates;
+        let no_names_given = true;
+        if (names_of_roommates) {
+          let roommate_num = 0;
+          while (roommate_num < num_roommates) {
+            if (names_of_roommates[roommate_num] != "") {
+              no_names_given = false;
+              break;
+            }
+            roommate_num = roommate_num + 1;
+          }
+        } else {
+          names_of_roommates = "N/A";
+        }
+        if (no_names_given == true && num_roommates > 0) {
+          names_of_roommates = "No names given.";
+        }
         admin_table.innerHTML += `<tr id="row_${i}">
           <td id="first_name_${i}"></td>
             <td id="last_name_${i}"></td>
             <td id="address_${i}"> ${info_data.address}</td>
             <td id="apt_no_${i}">${info_data.apt_no}</td>
             <td id="num_roommates_${i}">${info_data.number_of_roommates}</td>
+            <td id="names_roommates_${i}">${names_of_roommates}</td>
             <td id="order_amt_${i}">${info_data.number_of_coolers}</td>
             <td id="returning_${i}">${info_data.returning_customer}</td>
             <td id="payment_made_${i}">${info_data.payment_made}</td>
@@ -182,6 +375,8 @@ admin_page_btn.addEventListener("click", () => {
           db.collection("customer_info")
             .get()
             .then((data) => {
+              let names_roommates_elem =
+                document.getElementById("update_names");
               data.docs.forEach((doc) => {
                 if (doc.id == pairings[index]) {
                   document.getElementById(
@@ -197,6 +392,25 @@ admin_page_btn.addEventListener("click", () => {
                       document.getElementById("update_a_email").value =
                         user_data.docs[0].data().email;
                     });
+                  let roommates_array = doc.data().names_of_roommates;
+                  if (roommates_array) {
+                    let b = 1;
+                    names_roommates_elem.innerHTML = "";
+                    doc.data().names_of_roommates.forEach((name) => {
+                      names_roommates_elem.innerHTML += `<div class="field"> <label class="label"> Roommate ${b}'s Name </label> <div class="control">
+                        <input
+                          class="input"
+                          type="text"
+                          class="update_a_name_roommate"
+                          id="update_a_name_roommate_${b}"
+                          required
+                          value="${name}"
+                        />
+                      </div> </div>`;
+                      roommate_name_id = `update_a_name_roommate_${b}`;
+                      b = b + 1;
+                    });
+                  }
                 }
               });
               let first_name_id = `first_name_${index}`;
@@ -271,13 +485,24 @@ admin_page_btn.addEventListener("click", () => {
     if (document.getElementById("update_a_pmt_made").value == "True") {
       payment_made_value = true;
     }
+    let roommate_name_num = 0;
+    let uploaded_updated_names = [];
+    let updated_names = document.getElementsByClassName(
+      "update_a_name_roommate"
+    );
+    while (roommate_name_num < updated_names.length) {
+      uploaded_updated_names.push(updated_names[roommate_name_num].value);
+      roommate_name_num = roommate_name_num + 1;
+    }
     db.collection("customer_info")
       .doc(cust_doc_id)
       .update({
         address: document.getElementById("update_a_address").value,
         apt_no: document.getElementById("update_a_apt_no").value,
-        number_of_roommates: document.getElementById("update_a_num_roommates")
-          .value,
+        number_of_roommates: Number(
+          document.getElementById("update_a_num_roommates").value
+        ),
+        names_of_roommates: uploaded_updated_names,
         returning_customer: returning_customer_value,
         payment_made: payment_made_value,
         order_semester: document.getElementById("update_a_order_semester")
@@ -292,7 +517,11 @@ admin_page_btn.addEventListener("click", () => {
             .getElementById("update_a_order_semester")
             .value.split(" ")[1],
       })
-      .then();
+      .then(() => {
+        document
+          .getElementById("update_cust_info_ad_modal")
+          .classList.remove("is-active");
+      });
   });
 });
 function rev() {
@@ -409,6 +638,7 @@ function logout() {
         document.getElementById("social_icon").classList.remove("is-hidden");
       }
       loadHomePage();
+      location.reload();
     });
 }
 
@@ -419,7 +649,7 @@ signupModal.innerHTML = `
         <div class="modal-background"></div>
         <div class="modal-content">
             <div class="box">
-                <h1 class="title">Sign Up</h1>
+                <h1 class="title">Order Sign Up</h1>
                 <form id="signupForm">
                 <div class="field">
                   <label class="label"> First Name (one per room)</label>
@@ -929,3 +1159,27 @@ const phoneModalClose = document.getElementById("phonemodal-close");
 phoneModalClose.addEventListener("click", () => {
   phoneModal.classList.remove("is-active");
 });
+
+const payNowModal = document.createElement("div");
+payNowModal.classList.add("modal");
+payNowModal.id = "pay_now_modal";
+payNowModal.innerHTML = `
+  <div class="modal-background"></div>
+  <div class="modal-content has-text-centered">
+    <div class="box">
+      <h2 class="title is-4">Scan to Pay</h2>
+      <h4 class="title is-6">Pay Amount due for your order through Venmo</h4>
+       <p id="amount_due" class="mb-4 has-text-weight-semibold"></p>
+      <img src="venmo.jpeg" alt="Venmo QR Code" style="max-width: 300px;" />
+            <h4 class="title is-6">@Brettlachtman</h4>
+    </div>
+  </div>
+  <button class="modal-close is-large" aria-label="close"></button>
+`;
+document.body.appendChild(payNowModal);
+
+document
+  .querySelector("#pay_now_modal .modal-close")
+  .addEventListener("click", () => {
+    document.getElementById("pay_now_modal").classList.remove("is-active");
+  });
