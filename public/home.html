@@ -41,6 +41,129 @@
           alt="Account Icon"
         />
       </nav>
+      <div class="modal" id="update_cust_info_ad_modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <div class="box">
+            <h2 class="title">Update Information</h2>
+            <p class="subtitle">
+              For dropdowns, the first value is the user's current status.
+            </p>
+            <p id="num" class="is-hidden"></p>
+            <form id="update_cust_info_ad_form">
+              <div class="field">
+                <label class="label"> First Name </label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    id="update_a_name1"
+                    required
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label"> Last Name </label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    id="update_a_name2"
+                    required
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Email</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="email"
+                    id="update_a_email"
+                    required
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Order Semester</label>
+                <div class="control">
+                  <div class="select">
+                    <select id="update_a_order_semester"></select>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Address</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    id="update_a_address"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Apartment Number</label>
+                <div class="control">
+                  <input class="input" type="text" id="update_a_apt_no" />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label"> Number of Roommates </label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="number"
+                    id="update_a_num_roommates"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label"> Returning Customer</label>
+                <div class="select">
+                  <select id="update_a_returning"></select>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label"> Payment Made </label>
+                <div class="select">
+                  <select id="update_a_pmt_made"></select>
+                </div>
+              </div>
+              <div class="field is-grouped">
+                <div class="control">
+                  <button
+                    type="submit"
+                    class="button is-info"
+                    id="update_a_send"
+                  >
+                    Send
+                  </button>
+                </div>
+                <div class="control">
+                  <button
+                    type="reset"
+                    class="button is-light"
+                    id="update_a_reset"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <button
+            class="modal-close is-large"
+            id="update_cust_info_ad_close"
+            aria-label="close"
+          ></button>
+        </div>
+      </div>
     </header>
 
     <main id="main-content" class="section">

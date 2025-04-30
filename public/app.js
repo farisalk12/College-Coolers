@@ -115,6 +115,7 @@ admin_page_btn.addEventListener("click", () => {
           <td></td>
         </tr>
       </table>`;
+  let pairings = [];
   db.collection("customer_info")
     .get()
     .then((data) => {
@@ -130,9 +131,10 @@ admin_page_btn.addEventListener("click", () => {
           <th>Payment Made </th>
           <th>Edit Info </th>
         </tr>`;
-      let i = 1;
-
+      let i = 0;
       data.docs.forEach((doc) => {
+        pairings.push(doc.id);
+        console.log(pairings);
         info_data = doc.data();
         admin_table.innerHTML += `<tr id="row_${i}">
           <td id="first_name_${i}"></td>
@@ -143,8 +145,8 @@ admin_page_btn.addEventListener("click", () => {
             <td id="order_amt_${i}">${info_data.number_of_coolers}</td>
             <td id="returning_${i}">${info_data.returning_customer}</td>
             <td id="payment_made_${i}">${info_data.payment_made}</td>
-            <td id="${doc.id}">
-            <button class="button has-background-success update_info"> Edit </button>
+            <td>
+            <button class="button has-background-success update_info" id="update_${i}"> Edit </button>
             </td>
             </tr>`;
         let first_name_id = `first_name_${i}`;
@@ -161,14 +163,137 @@ admin_page_btn.addEventListener("click", () => {
         i = i + 1;
       });
       let info_update_buttons = document.getElementsByClassName("update_info");
-      let update_button_num = 0;
-      while (update_button_num < info_update_buttons.length) {
-        info_update_buttons[update_button_num].addEventListener("click", () => {
-          db.collection("customer_info");
+      let cust_order_semester = "";
+      let num = 0;
+      while (num < info_update_buttons.length) {
+        let index = Number(info_update_buttons[num].id.split("_")[1]);
+        document.getElementById("num").innerHTML = index;
+        info_update_buttons[index].addEventListener("click", () => {
+          document
+            .getElementById("update_cust_info_ad_modal")
+            .classList.add("is-active");
+          document
+            .getElementById("update_cust_info_ad_close")
+            .addEventListener("click", () => {
+              document
+                .getElementById("update_cust_info_ad_modal")
+                .classList.remove("is-active");
+            });
+          db.collection("customer_info")
+            .get()
+            .then((data) => {
+              data.docs.forEach((doc) => {
+                if (doc.id == pairings[index]) {
+                  document.getElementById(
+                    "update_a_order_semester"
+                  ).innerHTML = `<option> ${
+                    doc.data().order_semester
+                  } </option>`;
+                  cust_order_semester = doc.data().order_semester;
+                  db.collection("users")
+                    .where("user_id", "==", doc.data().user_id)
+                    .get()
+                    .then((user_data) => {
+                      document.getElementById("update_a_email").value =
+                        user_data.docs[0].data().email;
+                    });
+                }
+              });
+              let first_name_id = `first_name_${index}`;
+              let last_name_id = `last_name_${index}`;
+              let address_id = `address_${index}`;
+              let apt_no_id = `apt_no_${index}`;
+              let num_roommates_id = `num_roommates_${index}`;
+              let returning_id = `returning_${index}`;
+              let pmt_made_id = `payment_made_${index}`;
+              document.getElementById("update_a_name1").value =
+                document.getElementById(first_name_id).innerHTML;
+              document.getElementById("update_a_name2").value =
+                document.getElementById(last_name_id).innerHTML;
+
+              db.collection("order_semester_deadlines")
+                .orderBy("order_deadline")
+                .limit(4)
+                .get()
+                .then((os_data) => {
+                  os_docs = os_data.docs;
+                  os_docs.forEach((os_doc) => {
+                    let os_doc_order_semester = os_doc.data().semester;
+                    if (cust_order_semester != os_doc_order_semester) {
+                      document.getElementById(
+                        "update_a_order_semester"
+                      ).innerHTML += `<option> ${os_doc_order_semester} </option>`;
+                    }
+                  });
+                });
+              document.getElementById("update_a_address").value =
+                document.getElementById(address_id).innerHTML;
+              document.getElementById("update_a_apt_no").value =
+                document.getElementById(apt_no_id).innerHTML;
+              document.getElementById("update_a_num_roommates").value =
+                document.getElementById(num_roommates_id).innerHTML;
+              if (Boolean(document.getElementById(returning_id))) {
+                document.getElementById(
+                  "update_a_returning"
+                ).innerHTML = `<option>True</option>
+                <option> False </option>`;
+              } else {
+                document.getElementById(
+                  "update_a_returning"
+                ).innerHTML = `<option>False</option>
+                <option> True </option>`;
+              }
+              if (Boolean(document.getElementById(pmt_made_id))) {
+                document.getElementById(
+                  "update_a_pmt_made"
+                ).innerHTML = `<option>True</option>
+                <option> False </option>`;
+              } else {
+                document.getElementById(
+                  "update_a_pmt_made"
+                ).innerHTML = `<option>False</option>
+                <option> True </option>`;
+              }
+            });
         });
-        update_button_num = update_button_num + 1;
+        num = num + 1;
       }
     });
+  document.getElementById("update_a_send").addEventListener("click", () => {
+    event.preventDefault();
+    let cust_doc_id =
+      pairings[Number(document.getElementById("num").innerHTML)];
+    let returning_customer_value = false;
+    if (document.getElementById("update_a_returning").value == "True") {
+      returning_customer_value = true;
+    }
+    let payment_made_value = false;
+    if (document.getElementById("update_a_pmt_made").value == "True") {
+      payment_made_value = true;
+    }
+    db.collection("customer_info")
+      .doc(cust_doc_id)
+      .update({
+        address: document.getElementById("update_a_address").value,
+        apt_no: document.getElementById("update_a_apt_no").value,
+        number_of_roommates: document.getElementById("update_a_num_roommates")
+          .value,
+        returning_customer: returning_customer_value,
+        payment_made: payment_made_value,
+        order_semester: document.getElementById("update_a_order_semester")
+          .value,
+        order_semester_id:
+          document
+            .getElementById("update_a_order_semester")
+            .value.split(" ")[0]
+            .toLowerCase() +
+          "_" +
+          document
+            .getElementById("update_a_order_semester")
+            .value.split(" ")[1],
+      })
+      .then();
+  });
 });
 
 function logout() {
