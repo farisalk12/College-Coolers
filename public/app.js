@@ -801,7 +801,7 @@ let signup_semester_element = document.getElementById("signup_order_semester");
 db.collection("order_semester_deadlines")
   .where("order_deadline", ">=", new Date(Date.now()))
   .orderBy("order_deadline")
-  .limit(2)
+  .limit(4)
   .get()
   .then((data) => {
     data.docs.forEach((doc) => {
