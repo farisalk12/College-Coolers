@@ -273,7 +273,7 @@ account_icon.addEventListener("click", showAccountDetails);
 const admin_page_btn = document.getElementById("admin_page_btn");
 
 admin_page_btn.addEventListener("click", () => {
-  mainElement.innerHTML = `<input class="input" placeholder="Search" />
+  mainElement.innerHTML = `
       <table
         class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" id="admin_info"
       >
