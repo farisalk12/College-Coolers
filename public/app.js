@@ -331,7 +331,7 @@ admin_page_btn.addEventListener("click", () => {
         admin_table.innerHTML += `<tr id="row_${i}">
           <td id="first_name_${i}"></td>
             <td id="last_name_${i}"></td>
-            <td id="address_${i}"> ${info_data.address}</td>
+            <td id="address_${i}">${info_data.address}</td>
             <td id="apt_no_${i}">${info_data.apt_no}</td>
             <td id="num_roommates_${i}">${info_data.number_of_roommates}</td>
             <td id="names_roommates_${i}">${names_of_roommates}</td>
@@ -380,6 +380,8 @@ admin_page_btn.addEventListener("click", () => {
               let names_roommates_elem =
                 document.getElementById("update_names");
               let form_data = ind_data.docs[0].data();
+              let admin_edit_initial_names_roommates =
+                form_data.names_of_roommates;
               document.getElementById(
                 "update_a_order_semester"
               ).innerHTML = `<option> ${form_data.order_semester} </option>`;
@@ -427,16 +429,27 @@ admin_page_btn.addEventListener("click", () => {
                 document.getElementById(num_roommates_id).innerHTML;
               document.getElementById("update_a_num_roommates").value =
                 admin_edit_initial_num_roommates;
-              let initial_roommate_i = 1;
+              let initial_roommate_i = 0;
               if (admin_edit_initial_num_roommates > 0) {
                 names_roommates_elem.innerHTML = `<label class = "label"> Roommates' First and Last Names</label>`;
-                while (initial_roommate_i <= admin_edit_initial_num_roommates) {
-                  names_roommates_elem.innerHTML += `<div class = "field">
+                while (initial_roommate_i < admin_edit_initial_num_roommates) {
+                  let roommate_name =
+                    admin_edit_initial_names_roommates[initial_roommate_i];
+                  if (roommate_name == "") {
+                    names_roommates_elem.innerHTML += `<div class = "field">
                         <label class = "label"> Roommate ${initial_roommate_i} Name</label>
                         <div class = "control">
                           <input class = "input update_a_name_roommate" type = "text" id="update_a_name_roommate_${initial_roommate_i}" />
                         </div>
                       </div>`;
+                  } else {
+                    names_roommates_elem.innerHTML += `<div class = "field">
+                    <label class = "label"> Roommate ${initial_roommate_i} Name</label>
+                    <div class = "control">
+                      <input class = "input update_a_name_roommate" type = "text" id="update_a_name_roommate_${initial_roommate_i}" value="${roommate_name}"/>
+                    </div>
+                  </div>`;
+                  }
                   initial_roommate_i = initial_roommate_i + 1;
                 }
               }
@@ -902,7 +915,7 @@ signupModal
             .then(() => {
               db.collection("customer_info")
                 .add(customer_info)
-                .then(() => {
+                .then((data) => {
                   semester_id = "";
                   userDetails.name =
                     document.getElementById("signup_name1").value +
@@ -910,6 +923,9 @@ signupModal
                     document.getElementById("signup_name2").value;
                   userDetails.email =
                     document.getElementById("signup_email").value;
+                  db.collection("customer_info").doc(data.id).update({
+                    customer_info_id: data.id,
+                  });
                   signinButton.style.display = "none"; // Hide Sign In button
                   signupButton.style.display = "none"; // Hide Sign Up button
                   addAccountIcon();
