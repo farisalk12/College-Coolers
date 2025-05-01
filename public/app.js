@@ -28,7 +28,12 @@ function showAccountDetails() {
 
       if (!isAdmin) {
         accountHTML += `
-          <p id="acct_details_phone"><strong>Phone Number:</strong> ${userData.phone_no}</p>
+          <p><strong>Email Verified:</strong> ${
+            firebase.auth().currentUser.emailVerified
+          }</p>
+          <p id="acct_details_phone"><strong>Phone Number:</strong> ${
+            userData.phone_no
+          }</p>
           <p id="acct_details_address"><strong>Address:</strong></p>
           <p id="acct_details_apt"><strong>Apartment Number:</strong></p>
           <p id="acct_details_coolers"><strong>Number of Coolers:</strong></p>
@@ -908,7 +913,7 @@ signupModal
           let user = userCredential.user;
           user_info.user_id = user.uid;
           customer_info.user_id = user.uid;
-          // firebase.auth().currentUser.sendEmailVerification().then();
+          firebase.auth().currentUser.sendEmailVerification().then();
           db.collection("users")
             .doc(user.uid)
             .set(user_info)
